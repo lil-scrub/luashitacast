@@ -30,6 +30,12 @@ local sets = {
 		Hands = 'Dream Mittens +1',
 		Feet = 'Dream Boots +1',
     },
+    ['Flex'] = {
+        Head = '';
+        Body = '';
+        Legs = '';
+        Feet = '';
+    }
 };
 profile.Sets = sets;
 
@@ -52,9 +58,9 @@ end
 profile.EquipMelee = function()
     -- Accuracy
     if (Settings.UseAccuracy) then
-        gFunc.EquipSet(sets.Melee_Att);
-    else
         gFunc.EquipSet(sets.Melee_Acc);
+    else
+        gFunc.EquipSet(sets.Melee_Att);
     end
 end
 

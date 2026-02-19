@@ -52,17 +52,6 @@ local sets = {
 };
 profile.Sets = sets;
 
-evalLevel = function()
-	-- Evaluate Level Sync
-    local level = AshitaCore:GetMemoryManager():GetPlayer():GetMainJobLevel();
-    if (level ~= Settings.CurrentLevel) then
-        gFunc.EvaluateLevels(profile.Sets, level);
-        Settings.CurrentLevel = level;
-	end
-
-    -- Evaluate Level Sync for common equipsets
-    common.EvalLevel(level);
-end
 
 profile.Packer = {
 };
@@ -91,19 +80,7 @@ profile.HandleCommand = function(args)
     common.SetMeleeOptions(args[1]);
 
     if (args[1] == 'jug') then
-        if (args[2] == nil) then
-            if (Settings.UseHQJugs) then
-                gFunc.Message("Jug: hq " .. Settings.Jug);
-            else
-                gFunc.Message("Jug: " .. Settings.Jug);
-            end
-        elseif (args[2] == 'hq') then
-            Settings.UseHQJugs = not Settings.UseHQJugs;
-            gFunc.Message('Use HQ Jugs: ' .. tostring(Settings.UseHQJugs));
-        else
-            Settings.Jug = args[2];
-            gFunc.Message('Use Jug: ' .. tostring(Settings.Jug));
-        end
+        setJug(args[2], args[3]);
     end
 end
 
@@ -169,6 +146,46 @@ profile.HandleMidshot = function()
 end
 
 profile.HandleWeaponskill = function()
+end
+
+-- Helper functions
+
+evalLevel = function()
+	-- Evaluate Level Sync
+    local level = AshitaCore:GetMemoryManager():GetPlayer():GetMainJobLevel();
+    if (level ~= Settings.CurrentLevel) then
+        gFunc.EvaluateLevels(profile.Sets, level);
+        Settings.CurrentLevel = level;
+	end
+
+    -- Evaluate Level Sync for common equipsets
+    common.EvalLevel(level);
+end
+
+setJug = function(arg1, arg2)
+    if (arg2 == nil) then
+        if (arg1 == "hq") then
+            -- No pet specified, toggle hq jug
+            Settings.UseHQJugs = not Settings.UseHQJugs;
+            gFunc.Message('use hq jugs: ' .. tostring(Settings.UseHQJugs));
+        elseif sets.Jugs[arg1] ~= nil then
+            -- Pet specified, no hq tag
+            Settings.Jug = arg1;
+            gFunc.Message('use jug: ' .. tostring(Settings.Jug));
+        else
+            gFunc.Message('unknown pet');
+        end
+    elseif (arg1 == "hq") then
+        if sets.Jugs_HQ[arg2] ~= nil then
+            -- Pet specified, no hq tag
+            Settings.Jug = arg2;
+            gFunc.Message('use jug: hq ' .. tostring(Settings.Jug));
+        else
+            gFunc.Message('unknown pet');
+        end
+    else
+        gFunc.Message('unknown args. /bst jug (hq) pet');
+    end
 end
 
 return profile;
