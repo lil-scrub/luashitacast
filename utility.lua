@@ -3,6 +3,8 @@ local profile = {};
 local Settings = {
     UseExperience = false,
     UseWarp = false,
+	UseSneak = false,
+	UseInvis = false,
 };
 
 local sets = {
@@ -29,11 +31,19 @@ local sets = {
 profile.SetOptions = function(option)
     if (option == 'exp') then
         Settings.UseExperience = not Settings.UseExperience;
-        gFunc.Message('Use Experience: ' .. tostring(Settings.UseExperience));
+        gFunc.Message('use experience set: ' .. tostring(Settings.UseExperience));
     end
     if (option == 'warp') then
         Settings.UseWarp = not Settings.UseWarp;
-        gFunc.Message('Use Warp: ' .. tostring(Settings.UseWarp));
+        gFunc.Message('use warp set: ' .. tostring(Settings.UseWarp));
+    end
+    if (option == 'sneak') then
+        Settings.UseSneak = not Settings.UseSneak;
+        gFunc.Message('use sneak set: ' .. tostring(Settings.UseExperience));
+    end
+    if (option == 'invis') then
+        Settings.UseInvis = not Settings.UseInvis;
+        gFunc.Message('use invis set: ' .. tostring(Settings.UseInvis));
     end
 end
 
@@ -47,6 +57,17 @@ profile.EquipSet = function()
     if (Settings.UseWarp) then
         gFunc.EquipSet(sets.WarpClub);
     end
+
+	-- Sneak Boots
+    if (Settings.UseSneak) then
+        gFunc.EquipSet(sets.UseSneak);
+    end
+
+	-- Invis Gloves
+    if (Settings.UseInvis) then
+        gFunc.EquipSet(sets.UseInvis);
+    end
+
 end
 
 
