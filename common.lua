@@ -44,11 +44,7 @@ end
 profile.SetMeleeOptions = function(option)
     -- Evaluate Melee Optional Sets
     if (option == 'acc') then
-        if (Settings.UseAccuracy) then
-            Settings.UseAccuracy = false;
-        else
-            Settings.UseAccuracy = true;
-        end
+        Settings.UseAccuracy = not Settings.UseAccuracy;
         gFunc.Message('Use Accuracy: ' .. tostring(Settings.UseAccuracy));
     end
 end

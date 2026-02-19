@@ -58,11 +58,7 @@ profile.HandleCommand = function(args)
     common.SetMeleeOptions(args[1]);
 
     if (args[1] == 'refresh') then
-        if (Settings.HaveRefresh) then
-            Settings.HaveRefresh = false;
-        else
-            Settings.HaveRefresh = true;
-        end
+		Settings.HaveRefresh = not Settings.HaveRefresh;
         gFunc.Message('Have Refresh: ' .. tostring(Settings.HaveRefresh));
     end
 end
