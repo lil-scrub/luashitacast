@@ -41,10 +41,7 @@ profile.Sets = sets;
 
 profile.EvalLevel = function(level)
 	-- Evaluate Level Sync
-    if (level ~= Settings.CurrentLevel) then
-        gFunc.EvaluateLevels(profile.Sets, level);
-        Settings.CurrentLevel = level;
-	end
+    gFunc.EvaluateLevels(profile.Sets, level);
 end
 
 profile.SetMeleeOptions = function(option)
