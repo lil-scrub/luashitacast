@@ -17,7 +17,7 @@ sets = {
         Feet = {'Silver Greaves', 'Leaping Boots'},
     },
 	['Weapon_Refresh_Priority'] = {
-		Main = {'Mythril Sword', 'Flame Sword', 'Bee Spatha +1', 'Wax Sword +1'},
+		Main = {'Honor sword', 'Mythril Sword', 'Flame Sword', 'Bee Spatha +1', 'Wax Sword +1'},
 		Sub = {'Jennet Shield', 'Turtle Shield +1', 'Shell Shield'},
 	},
 	['Weapon_No_Refresh_Priority'] = {
