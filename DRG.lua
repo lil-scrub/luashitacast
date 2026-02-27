@@ -4,8 +4,6 @@ local common = gFunc.LoadFile('./common.lua');
 
 local Settings = {
 	CurrentLevel = 0,
-	HaveRefresh = false,
-	UseAccuracy = false,
 };
 
 sets = {
@@ -58,6 +56,7 @@ profile.HandleDefault = function()
 	if (player.Status == 'Engaged') then
         -- Default load common melee setup
         common.EquipMelee();
+        gFunc.EquipSet(common.Sets.Dream);
 	end
 
     utility.EquipSet();
