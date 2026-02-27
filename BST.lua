@@ -45,6 +45,7 @@ local sets = {
     },
     ['Jugs'] = {
         ['tiger'] = {Ammo = 'Meat Broth'},
+        ['rabbit'] = {Ammo = 'Carrot Broth'}
     },
     ['Jugs_HQ'] = {
         ['sheep'] = {Ammo = 'S. Herbal Broth'},
@@ -163,28 +164,23 @@ evalLevel = function()
 end
 
 setJug = function(arg1, arg2)
-    if (arg2 == nil) then
-        if (arg1 == "hq") then
-            -- No pet specified, toggle hq jug
-            Settings.UseHQJugs = not Settings.UseHQJugs;
-            gFunc.Message('use hq jugs: ' .. tostring(Settings.UseHQJugs));
-        elseif sets.Jugs[arg1] ~= nil then
-            -- Pet specified, no hq tag
-            Settings.Jug = arg1;
-            gFunc.Message('use jug: ' .. tostring(Settings.Jug));
-        else
-            gFunc.Message('unknown pet');
-        end
-    elseif (arg1 == "hq") then
+    if (arg1 == "hq") then
+        Settings.UseHQJugs = true
         if sets.Jugs_HQ[arg2] ~= nil then
             -- Pet specified, no hq tag
             Settings.Jug = arg2;
-            gFunc.Message('use jug: hq ' .. tostring(Settings.Jug));
-        else
-            gFunc.Message('unknown pet');
         end
+    elseif sets.Jugs[arg1] ~= nil then
+        Settings.UseHQJugs = false
+        -- Pet specified, no hq tag
+        Settings.Jug = arg1;
+    end
+    
+    -- Display Default Jug Setting
+    if (Settings.UseHQJugs) then
+        gFunc.Message("Jug: hq " .. Settings.Jug);
     else
-        gFunc.Message('unknown args. /bst jug (hq) pet');
+        gFunc.Message("Jug: " .. Settings.Jug);
     end
 end
 
