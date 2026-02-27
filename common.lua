@@ -23,7 +23,7 @@ local sets = {
         Ear1 = {'Bone Earring +1'},
         Ear2 = {'Bone Earring +1'},
     },
-    ['Dream_Priority'] = {
+    ['Dream'] = {
         Head = 'Dream Hat +1',
         Body = 'Dream Robe +1',
         Legs = 'Dream Pants +1',
