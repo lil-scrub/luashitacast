@@ -39,7 +39,7 @@ profile.SetOptions = function(option)
     end
     if (option == 'sneak') then
         Settings.UseSneak = not Settings.UseSneak;
-        gFunc.Message('use sneak set: ' .. tostring(Settings.UseExperience));
+        gFunc.Message('use sneak set: ' .. tostring(Settings.UseSneak));
     end
     if (option == 'invis') then
         Settings.UseInvis = not Settings.UseInvis;
@@ -60,12 +60,12 @@ profile.EquipSet = function()
 
 	-- Sneak Boots
     if (Settings.UseSneak) then
-        gFunc.EquipSet(sets.UseSneak);
+        gFunc.EquipSet(sets.Sneak);
     end
 
 	-- Invis Gloves
     if (Settings.UseInvis) then
-        gFunc.EquipSet(sets.UseInvis);
+        gFunc.EquipSet(sets.Invisible);
     end
 
 end
