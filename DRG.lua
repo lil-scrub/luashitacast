@@ -7,7 +7,7 @@ local Settings = {
 };
 
 sets = {
-    ['TP_Priority'] = {
+    ['Tp_Priority'] = {
 		Head = {'Silver Mask', 'Iron Mask +1', 'Bone Mask +1', 'Ryl.Ftm. Bandana'},
 		Body = {'Silver Mail', 'Chainmail', 'Bone Harness +1', 'Scale Mail'},
 		Hands = {'Silver Mittens', 'Ryl.Ftm. Gloves'},
@@ -57,6 +57,7 @@ profile.HandleDefault = function()
         -- Default load common melee setup
         common.EquipMelee();
         gFunc.EquipSet(common.Sets.Dream);
+        gFunc.EquipSet(profile.Sets.Tp);
 	end
 
     utility.EquipSet();
@@ -65,6 +66,10 @@ end
 
 profile.HandleAbility = function()
 	local action = gData.GetAction();
+
+	if (action.Name == 'Jump') then
+		gFunc.EquipSet(common.Sets.Melee_Att)
+	end
 end
 
 profile.HandleItem = function()
