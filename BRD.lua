@@ -8,8 +8,9 @@ local Settings = {
 
 sets = {
 	['Pulling_Priority'] = {
+		Main = {'Blind Dagger'},
 		Ammo = {'Pebble'},
-		Head = {'Emperor Hairpin'},
+		Head = {'Emperor Hairpin', 'Noble\'s Ribbon'},
 		Body = {'Bone Harness +1'},
 		Legs = {'Bone Subligar +1'},
 		Feet = {'Leaping Boots'},
@@ -48,6 +49,8 @@ end
 
 profile.OnLoad = function()
     gSettings.AllowAddSet = true;
+
+    AshitaCore:GetChatManager():QueueCommand(-1, '/macro book 2');
 end
 
 profile.OnUnload = function()
