@@ -7,25 +7,24 @@ local Settings = {
 };
 
 sets = {
-	['Pulling'] = {
-		Ammo = 'Pebble',
-		Head = 'Emperor Hairpin',
-		Body = 'Bone Harness +1',
-		Legs = 'Bone Subligar +1',
-		Feet = 'Leaping Boots',
-		Hands = 'Ryl.Ftm. Gloves',
-		Ring1 = 'Balance Ring',
-		Ring2 = 'Balance Ring',
+	['Pulling_Priority'] = {
+		Ammo = {'Pebble'},
+		Head = {'Emperor Hairpin'},
+		Body = {'Bone Harness +1'},
+		Legs = {'Bone Subligar +1'},
+		Feet = {'Leaping Boots'},
+		Hands = {'Ryl.Ftm. Gloves'},
 	},
-	['Songs'] = {
-        Ring1 = 'Hope Ring',
-        Ring2 = 'Hope Ring',
+	['Songs_Priority'] = {
+		Main = {'Monster Signa'},
+        Ring1 = {'Hope Ring'},
+        Ring2 = {'Hope Ring'},
 	}
 };
 songs = {
-    ['Paeon'] = {},
-	['Minuet'] = {
-		Range = 'cornette +1',
+    ['Paeon_Priority'] = {},
+	['Minuet_Priority'] = {
+		Range = {'cornette +1'},
 	}
 };
 profile.Sets = sets;
@@ -45,19 +44,6 @@ evalLevel = function()
 end
 
 equipSong = function(song)
-	gFunc.EquipSet(sets.Songs)
-
-	if (string.match(song, 'Minuet')) then
-		gFunc.EquipSet(songs.Minuet);
-	elseif (string.match(song, 'Madrigal')) then
-		gFunc.EquipSet(songs.Minuet);
-	elseif (string.match(song, 'Paeon')) then
-		gFunc.EquipSet(songs.Minuet);
-	elseif (string.match(song, 'Mambo')) then
-		gFunc.EquipSet(songs.Minuet);
-	elseif (string.match(song, 'Lullaby')) then
-		gFunc.EquipSet(songs.Minuet);
-	end
 end
 
 profile.OnLoad = function()
@@ -75,13 +61,8 @@ profile.HandleDefault = function()
 
 	evalLevel();
 	
-	if (player.Status == 'Idle') then
-		gFunc.EquipSet(common.Dream);
-		gFunc.EquipSet(sets.Pulling);
-	elseif (player.Status == 'Engaged') then
-		gFunc.EquipSet(common.Dream);
-		gFunc.EquipSet(sets.Pulling);
-	end
+	gFunc.EquipSet(common.Dream);
+	gFunc.EquipSet(profile.Sets.Pulling);
 end
 
 profile.HandleAbility = function()
@@ -103,7 +84,19 @@ profile.HandleMidcast = function()
 	utility.CheckCast(action.Name);
 
 	if (action.Type == 'Bard Song') then
-		equipSong(action.Name)
+		gFunc.EquipSet(profile.Sets.Songs)
+
+		if (string.match(action.Name, 'Minuet')) then
+			gFunc.EquipSet(profile.Songs.Minuet);
+		elseif (string.match(action.Name, 'Madrigal')) then
+			gFunc.EquipSet(profile.Songs.Minuet);
+		elseif (string.match(action.Name, 'Paeon')) then
+			gFunc.EquipSet(profile.Songs.Minuet);
+		elseif (string.match(action.Name, 'Mambo')) then
+			gFunc.EquipSet(profile.Songs.Minuet);
+		elseif (string.match(action.Name, 'Lullaby')) then
+			gFunc.EquipSet(profile.Songs.Minuet);
+		end
 	end
 
 end
