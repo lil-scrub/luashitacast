@@ -1,3 +1,4 @@
+local fishing = gFunc.LoadFile('./fishing.lua');
 local profile = {};
 
 local Settings = {
@@ -28,7 +29,7 @@ local sets = {
     },
 };
 
-profile.SetOptions = function(option)
+profile.SetOptions = function(option, arg)
     if (option == 'exp') then
         Settings.UseExperience = not Settings.UseExperience;
         gFunc.Message('use experience set: ' .. tostring(Settings.UseExperience));
@@ -45,9 +46,15 @@ profile.SetOptions = function(option)
         Settings.UseInvis = not Settings.UseInvis;
         gFunc.Message('use invis set: ' .. tostring(Settings.UseInvis));
     end
+    if (option == 'fish') then
+        fishing.Toggle(arg);
+    end
 end
 
 profile.EquipSet = function()
+    -- Fishing
+    fishing.EquipSet();
+
     -- Experience
     if (Settings.UseExperience) then
         gFunc.EquipSet(sets.Chariot);

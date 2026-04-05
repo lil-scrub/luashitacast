@@ -6,24 +6,33 @@ local Settings = {
 
 local sets = {
     ['Fishing'] = {
-        Range = '',
-        Ammo  = '',
-        Main  = '',
-        Body  = '',
-        Hands = '',
-        Legs  = '',
-        Feet  = '',
+        Range = 'Halcyon Rod',
+        Ammo  = 'Insect Ball',
+        Body  = 'Angler\'s Tunica',
+        Hands = 'Angler\'s Gloves',
+        Legs  = 'Angler\'s Hose',
+        Feet  = 'Angler\'s Boots',
     },
 };
 profile.Sets = sets;
 
-profile.Toggle = function()
+profile.Toggle = function(book)
     if (Settings.UseFishing) then
         Settings.UseFishing = false;
-        print('Turning off fishing');
+        gFunc.Message('use fishing set: ' .. tostring(Settings.UseFishing));
+
+        AshitaCore:GetChatManager():QueueCommand(-1, '/macro book ' .. book);
     else
         Settings.UseFishing = true;
-        print('Turning on fishing');
+        gFunc.Message('use fishing set: ' .. tostring(Settings.UseFishing));
+
+        AshitaCore:GetChatManager():QueueCommand(-1, '/macro book 20');
+    end
+end
+
+profile.EquipSet = function()
+    if (Settings.UseFishing) then
+        gFunc.EquipSet(profile.Sets.Fishing);
     end
 end
 
