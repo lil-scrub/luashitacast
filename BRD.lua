@@ -1,6 +1,7 @@
 local profile = {};
 local utility = gFunc.LoadFile('./utility.lua');
 local common = gFunc.LoadFile('./common.lua');
+local staves = gFunc.LoadFile('./staves.lua');
 
 local Settings = {
 	CurrentLevel = 0,
@@ -9,25 +10,34 @@ local Settings = {
 
 sets = {
 	['Pulling_Priority'] = {
-		Main = {'Blind Dagger'},
+		Main = {'Earth Staff'},
 		Ammo = {'Pebble'},
-		Head = {'Emperor Hairpin', 'Noble\'s Ribbon'},
-		Body = {'Bone Harness +1'},
-		Legs = {'Bone Subligar +1'},
-		Feet = {'Leaping Boots'},
-		Hands = {'Ryl.Ftm. Gloves'},
+		Head = {'Noble\'s Ribbon'},
+		Body = {'Savage Separates', 'Beetle Harness +1', 'Bone Harness +1'},
+		Legs = {'Savage loincloth', 'Republic Subligar', 'Bone Subligar +1'},
+		Feet = {'Savage Gaiters', 'Angler\'s Boots'},
+		Hands = {'Savage Gauntlets', 'Beetle Mittens +1', 'Ryl.Ftm. Gloves'},
 	},
 	['Songs_Priority'] = {
-		Main = {'Monster Signa'},
-        Ring1 = {'Hope Ring'},
-        Ring2 = {'Hope Ring'},
+		Main = {'Chanter\'s staff', 'Monster Signa'},
+		Neck = {'Bird whistle'},
+        	Ring1 = {'Hope Ring'},
+        	Ring2 = {'Hope Ring'},
 	}
 };
 songs = {
-    ['Paeon_Priority'] = {},
-	['Minuet_Priority'] = {
-		Range = {'cornette +1'},
-	}
+	['General_Priority'] = {
+		Range = {'Ryl.Spr. Horn', 'cornette +1'},
+	},
+	['Madrigal_Priority'] = {
+		Range = {'Traversiere +2', 'cornette +1'},
+	},
+	['Elegy'] = {
+		Range = 'horn +1',
+	},
+	['Minuet'] = {
+		Range = 'cornette +1',
+	},
 };
 profile.Sets = sets;
 profile.Songs = songs;
@@ -99,15 +109,27 @@ profile.HandleMidcast = function()
 		if (string.match(action.Name, 'Minuet')) then
 			gFunc.EquipSet(profile.Songs.Minuet);
 		elseif (string.match(action.Name, 'Madrigal')) then
-			gFunc.EquipSet(profile.Songs.Minuet);
+			gFunc.EquipSet(profile.Songs.Madrigal);
 		elseif (string.match(action.Name, 'Paeon')) then
-			gFunc.EquipSet(profile.Songs.Minuet);
+			gFunc.EquipSet(profile.Songs.General);
 		elseif (string.match(action.Name, 'Mambo')) then
-			gFunc.EquipSet(profile.Songs.Minuet);
+			gFunc.EquipSet(profile.Songs.General);
 		elseif (string.match(action.Name, 'Lullaby')) then
-			gFunc.EquipSet(profile.Songs.Minuet);
+			gFunc.EquipSet(profile.Songs.General);
+		elseif (string.match(action.Name, 'Ballad')) then
+			gFunc.EquipSet(profile.Songs.General);
+		elseif (string.match(action.Name, 'Prelude')) then
+			gFunc.EquipSet(profile.Songs.General);
+		elseif (string.match(action.Name, 'Finale')) then
+			gFunc.EquipSet(profile.Songs.General);
+		elseif (string.match(action.Name, 'Aubade')) then
+			gFunc.EquipSet(profile.Songs.General);
+		elseif (string.match(action.Name, 'Elegy')) then
+			gFunc.EquipSet(profile.Songs.Elegy);
 		end
 	end
+
+	staves.EquipStaff(action.Name);
 
 end
 

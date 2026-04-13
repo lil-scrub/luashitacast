@@ -5,7 +5,8 @@ local elements = {
         staff  = "Apollo's Staff",
         spells = {'Cure', 'Curaga', 'Cursna', 'Raise', 'Reraise', 'Banish', 'Holy',
                   'Regen', 'Protect', 'Shell', 'Phalanx', 'Erase', 'Barblind',
-                  'Dia', 'Paralyze', 'Aurorastorm'},
+                  'Dia', 'Paralyze', 'Aurorastorm',
+                  'Lullaby', 'Finale'},
     },
     ['Dark'] = {
         staff  = 'Dark Staff',
@@ -44,10 +45,10 @@ local elements = {
     },
 }
 
-profile.EquipStaff = function(spell)
+profile.EquipStaff = function(name)
     for _, data in pairs(elements) do
         for _, keyword in ipairs(data.spells) do
-            if string.match(spell.English, keyword) then
+            if string.match(name, keyword) then
                 gFunc.EquipSet({ Main = data.staff })
                 return
             end

@@ -9,8 +9,8 @@ local Settings = {
 
 local sets = {
 	['DualWield_Priority'] = {
-        Main = {'Darksteel Pick +1', 'Cmb.Cst. Axe', 'Tomahawk'},
-        Sub = {'Darksteel Pick +1', 'Barbaroi Axe', 'Tomahawk'},
+        Main = {'Darksteel Pick +1', 'Mythril Pick +1', 'Cmb.Cst. Axe', 'Tomahawk'},
+        Sub = {'Darksteel Pick +1', 'Mythril Pick +1', 'Barbaroi Axe', 'Tomahawk'},
 	},
 	['Scythe_Priority'] = {
         Main = {'Darksteel Pick +1'},
@@ -22,7 +22,7 @@ local sets = {
 	},
     ['Tp_Priority'] = {
         Head = {'Beast Helm', 'Emperor hairpin'},
-        Body = {'Beast Jackcoat', 'Ryl.Sqr. Chainmail', 'Chainmail'},
+        Body = {'Savage Seperates', 'Ryl.Sqr. Chainmail', 'Chainmail'},
         Hands = {'Beast Gloves', 'Ryl.Ftm. Gloves'},
         Legs = {'Beast Trousers', 'Ryl.Sqr. Breeches', 'Chain Hose'},
         Feet = {'Beast Gaiters', 'Leaping Boots'},
