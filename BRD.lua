@@ -9,11 +9,20 @@ local Settings = {
 };
 
 sets = {
-	['Pulling_Priority'] = {
+	['Pulling_NIN_Priority'] = {
 		Main = {'Earth Staff'},
 		Ammo = {'Pebble'},
 		Head = {'Noble\'s Ribbon'},
 		Body = {'Savage Separates', 'Beetle Harness +1', 'Bone Harness +1'},
+		Legs = {'Savage loincloth', 'Republic Subligar', 'Bone Subligar +1'},
+		Feet = {'Savage Gaiters', 'Angler\'s Boots'},
+		Hands = {'Savage Gauntlets', 'Beetle Mittens +1', 'Ryl.Ftm. Gloves'},
+	},
+	['Pulling_WHM_Priority'] = {
+		Main = {'Earth Staff'},
+		Ammo = {'Pebble'},
+		Head = {'Noble\'s Ribbon'},
+		Body = {'Gaudy Harness', 'Savage Separates', 'Beetle Harness +1', 'Bone Harness +1'},
 		Legs = {'Savage loincloth', 'Republic Subligar', 'Bone Subligar +1'},
 		Feet = {'Savage Gaiters', 'Angler\'s Boots'},
 		Hands = {'Savage Gauntlets', 'Beetle Mittens +1', 'Ryl.Ftm. Gloves'},
@@ -49,7 +58,7 @@ evalLevel = function()
 	-- Evaluate Level Sync
     local myLevel = AshitaCore:GetMemoryManager():GetPlayer():GetMainJobLevel();
     if (myLevel ~= Settings.CurrentLevel) then
-        gFunc.EvaluateLevels(profile.Sets, myLevel);
+		gFunc.EvaluateLevels(profile.Sets, myLevel);
         gFunc.EvaluateLevels(profile.Songs, myLevel);
         Settings.CurrentLevel = myLevel;
 	end
@@ -80,7 +89,12 @@ profile.HandleDefault = function()
 	evalLevel();
 	
 	gFunc.EquipSet(common.Dream);
-	gFunc.EquipSet(profile.Sets.Pulling);
+
+	if (player.SubJob == 'WHM') then
+		gFunc.EquipSet(profile.Sets.Pulling_WHM);
+	else
+		gFunc.EquipSet(profile.Sets.Pulling_NIN);
+	end
 
     utility.EquipSet();
 end
