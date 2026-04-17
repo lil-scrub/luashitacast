@@ -32,7 +32,10 @@ sets = {
 		Neck = {'Bird whistle'},
         	Ring1 = {'Hope Ring'},
         	Ring2 = {'Hope Ring'},
-	}
+	},
+	['RingProc'] = {
+		Ring1 = 'Minstrel\'s Ring',
+	},
 };
 songs = {
 	['General_Priority'] = {
@@ -110,6 +113,7 @@ profile.HandleItem = function()
 end
 
 profile.HandlePrecast = function()
+	gFunc.EquipSet(profile.Sets.RingProc);
 end
 
 profile.HandleMidcast = function()
