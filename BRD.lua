@@ -40,15 +40,19 @@ sets = {
 songs = {
 	['General_Priority'] = {
 		Range = {'Ryl.Spr. Horn', 'cornette +1'},
+		Legs = {'Choral Cannions'},
 	},
 	['Madrigal_Priority'] = {
 		Range = {'Traversiere +2', 'cornette +1'},
+		Legs = {'Choral Cannions'},
 	},
 	['Elegy'] = {
 		Range = 'horn +1',
+		Legs = 'Choral Cannions',
 	},
 	['Minuet'] = {
 		Range = 'cornette +1',
+		Legs = 'Choral Cannions',
 	},
 };
 profile.Sets = sets;
