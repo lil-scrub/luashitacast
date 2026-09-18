@@ -2,6 +2,10 @@ local profile = {};
 local utility = gFunc.LoadFile('./utility.lua');
 local common = gFunc.LoadFile('./common.lua');
 
+local Settings = {
+    MacroBook = '5',
+};
+
 sets = {};
 profile.Sets = sets;
 
@@ -10,6 +14,8 @@ profile.Packer = {
 
 profile.OnLoad = function()
     gSettings.AllowAddSet = true;
+
+    AshitaCore:GetChatManager():QueueCommand(-1, '/macro book ' .. Settings.MacroBook);
 end
 
 profile.OnUnload = function()

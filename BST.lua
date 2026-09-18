@@ -4,7 +4,8 @@ local common = gFunc.LoadFile('./common.lua');
 
 local Settings = {
     UseHQJugs = true,
-    Jug = "sheep"
+    Jug = "sheep",
+    MacroBook = '4'
 }
 
 local sets = {
@@ -85,6 +86,8 @@ profile.OnLoad = function()
     gSettings.AllowAddSet = true;
 	AshitaCore:GetChatManager():QueueCommand(-1, '/alias /bst /lac fwd');
 
+    AshitaCore:GetChatManager():QueueCommand(-1, '/macro book ' .. Settings.MacroBook);
+
     -- Display Default Jug Setting
     if (Settings.UseHQJugs) then
         gFunc.Message("Jug: hq " .. Settings.Jug);
@@ -99,7 +102,7 @@ end
 
 profile.HandleCommand = function(args)
     -- Handle utiility settings
-    utility.SetOptions(args[1]);
+    utility.SetOptions(args[1], Settings.MacroBook);
 
     -- Handle common settings
     common.SetMeleeOptions(args[1]);

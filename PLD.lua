@@ -4,6 +4,7 @@ local common = gFunc.LoadFile('./common.lua');
 
 local Settings = {
 	CurrentLevel = 0,
+	MacroBook = '3',
 	HaveRefresh = false,
 	UseAccuracy = false,
 };
@@ -44,6 +45,8 @@ end
 profile.OnLoad = function()
     gSettings.AllowAddSet = true;
 	AshitaCore:GetChatManager():QueueCommand(-1, '/alias /pld /lac fwd');
+
+    AshitaCore:GetChatManager():QueueCommand(-1, '/macro book ' .. Settings.MacroBook);
 end
 
 profile.OnUnload = function()
@@ -52,7 +55,7 @@ end
 
 profile.HandleCommand = function(args)
     -- Handle utiility settings
-    utility.SetOptions(args[1]);
+    utility.SetOptions(args[1], Settings.MacroBook);
 
     -- Handle common settings
     common.SetMeleeOptions(args[1]);
