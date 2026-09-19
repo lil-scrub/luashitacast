@@ -85,38 +85,51 @@ local sets = {
     -- Charm. CHR, plus gear that enhances charm outright.
     ['Charm_Priority'] = {
         Main  = { 'Apollo\'s Staff', 'Light Staff' },
-        Head  = { 'Monster Helm +1', 'Panther Mask', 'Monster Helm', 'Coral Cap',
+        Head  = { 'Monster Helm +1', 'Beast Helm +1', 'Monster Helm', 'Coral Cap',
              'Merman\'s Cap', 'Opo-opo Crown', 'Beast Helm', 'Super Ribbon',
              'Jester\'s Headband', 'Juggler\'s Headband', 'Rain Hat', 'Alluring Headband',
              'Trump Crown', 'Garrison Sallet', 'Noble\'s Ribbon', 'Entrancing Ribbon' },
-        Neck  = { 'Temperance Torque', 'Oscar Scarf', 'Merrow No. 17\'s Locket',
-             'Star Necklace', 'Stoneskin Torque', 'Torque', 'Flower Necklace', 'Beast Whistle',
-             'Bird Whistle', 'Dog Collar' },
+        Neck  = { 'Temperance Torque', 'Oscar Scarf', 'Star Necklace', 'Stoneskin Torque',
+             'Torque', 'Flower Necklace', 'Beast Whistle', 'Bird Whistle', 'Dog Collar' },
         Ear1  = { 'Delta Earring', 'Epsilon Earring', 'Beastly Earring', 'Melody Earring',
              'Melody Earring +1', 'Heims Earring' },
         Ear2  = { 'Delta Earring', 'Epsilon Earring', 'Beastly Earring', 'Melody Earring',
              'Melody Earring +1', 'Heims Earring' },
-        Body  = { 'Bison Jacket', 'Brave\'s Jacket', 'Khimaira Jacket', 'Byrnie', 'Byrnie +1',
-             'Black Cotehardie', 'Flora Cotehardie', 'Gaudy Harness', 'Brigandine +1',
+        Body  = { 'Brave\'s Jacket', 'Khimaira Jacket', 'Stout Jacket', 'Byrnie', 'Byrnie +1',
+             'Black Cotehardie', 'Flora Cotehardie', 'Beast Jackcoat', 'Brigandine +1',
              'Argent Coat', 'Ceremonial Dress', 'Freya\'s Jerkin', 'Federation Doublet',
              'Windurstian Doublet', 'Freyr\'s Jerkin', 'Garrison Tunica' },
-        Hands = { 'Pantin Dastanas +1', 'Beast Gloves +1', 'Tarasque Mitts', 'Marine F Gloves',
+        Hands = { 'Monster Gloves', 'Monster Gloves +1', 'Beast Gloves +1', 'Marine F Gloves',
              'Marine M Gloves', 'Trainer\'s Wristbands' },
-        Ring1 = { 'Dark Ring', 'Light Ring', 'Angel\'s Ring', 'Atlaua\'s Ring', 'Allure Ring',
-             'Allure Ring +1', 'Moon Ring', 'Kshama Ring No. 6', 'Vilma\'s Ring',
-             'Loyalty Ring', 'Loyalty Ring +1', 'Maldust Ring', 'Hope Ring', 'Opal Ring' },
-        Ring2 = { 'Dark Ring', 'Light Ring', 'Angel\'s Ring', 'Atlaua\'s Ring', 'Allure Ring',
-             'Allure Ring +1', 'Moon Ring', 'Kshama Ring No. 6', 'Vilma\'s Ring',
-             'Loyalty Ring', 'Loyalty Ring +1', 'Maldust Ring', 'Hope Ring', 'Opal Ring' },
+        Ring1 = { 'Dark Ring', 'Light Ring', 'Angel\'s Ring', 'Allure Ring', 'Allure Ring +1',
+             'Moon Ring', 'Kshama Ring No. 6', 'Vilma\'s Ring', 'Loyalty Ring',
+             'Loyalty Ring +1', 'Maldust Ring', 'Hope Ring', 'Opal Ring' },
+        Ring2 = { 'Dark Ring', 'Light Ring', 'Angel\'s Ring', 'Allure Ring', 'Allure Ring +1',
+             'Moon Ring', 'Kshama Ring No. 6', 'Vilma\'s Ring', 'Loyalty Ring',
+             'Loyalty Ring +1', 'Maldust Ring', 'Hope Ring', 'Opal Ring' },
         Waist = { 'Monster Belt', 'Czar\'s Belt', 'Kaiser Belt', 'Koenigs Belt',
              'Royal Knight\'s Belt +1', 'Royal Knight\'s Belt +2', 'Desert Stone', 'Corsette',
              'Corsette +1' },
-        Legs  = { 'Galliard Trousers', 'Clown\'s Subligar', 'Clown\'s Subligar +1',
-             'Coral Subligar', 'Merman\'s Subligar', 'Luna Subligar', 'Darksteel Codpiece',
-             'Ceremonial Hose', 'Platino Hose', 'Custom Pants', 'Custom Slacks',
-             'Elder\'s Braguette' },
-        Feet  = { 'Beast Gaiters +1', 'Heroic Boots', 'Heroic Boots +1', 'Marine F Boots',
+        Legs  = { 'Monster Trousers +1', 'Monster Trousers', 'Bison Kecks', 'Coral Subligar',
+             'Merman\'s Subligar', 'Luna Subligar', 'Darksteel Codpiece', 'Ceremonial Hose',
+             'Platino Hose', 'Custom Pants', 'Custom Slacks', 'Elder\'s Braguette' },
+        Feet  = { 'Monster Gaiters +1', 'Beast Gaiters +1', 'Monster Gaiters', 'Marine F Boots',
              'Marine M Boots', 'Beast Gaiters', 'Ceremonial Boots', 'Savage Gaiters' },
+    },
+    -- Call Beast snapshots the pet's bonuses at call time, so every
+    -- Pet: stat carried here sticks for the life of the pet. The broth
+    -- is equipped after this, so it keeps the ammo slot.
+    ['CallBeast_Priority'] = {
+        Head  = { 'Beast Helm +1', 'Beast Helm', 'Buffalo Helm', 'Shepherd\'s Bonnet' },
+        Ear1  = { 'Beastly Earring' },
+        Ear2  = { 'Beastly Earring' },
+        Body  = { 'Shepherd\'s Doublet' },
+        Hands = { 'Monster Gloves', 'Monster Gloves +1', 'Beast Bazubands',
+             'Shepherd\'s Bracers' },
+        Ring1 = { 'Spirited Ring' },
+        Ring2 = { 'Spirited Ring' },
+        Legs  = { 'Askar Dirs', 'Shepherd\'s Hose' },
+        Feet  = { 'Shepherd\'s Boots' },
     },
 	['Reward_Priority'] = {
         Ammo = {'Pet Fd. Epsilon', 'Pet Food Delta', 'Pet Fd. Gamma', 'Pet Food Beta'},
@@ -233,6 +246,10 @@ profile.HandleAbility = function()
 		gFunc.EquipSet(sets.Reward);
 	end
     if (action.Name == 'Call Beast') then
+        -- The pet snapshots these bonuses when it is called, so they matter
+        -- at call time and not afterwards.
+        gFunc.EquipSet(sets.CallBeast);
+
         local jug = nil;
         if (Settings.UseHQJugs) then
             jug = sets.Jugs_HQ[Settings.Jug];
