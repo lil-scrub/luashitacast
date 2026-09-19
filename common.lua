@@ -118,7 +118,13 @@ local GetOwnedItems = function()
                 if (item ~= nil) and (item.Count > 0) and (item.Id > 0) then
                     local resource = resources:GetItemById(item.Id);
                     if (resource ~= nil) then
-                        owned[string.lower(resource.Name[1])] = resource.Level;
+                        local key = string.lower(resource.Name[1]);
+                        local entry = owned[key];
+                        if (entry == nil) then
+                            owned[key] = { Level = resource.Level, Count = item.Count };
+                        else
+                            entry.Count = entry.Count + item.Count;
+                        end
                         found = found + 1;
                     end
                 end
@@ -136,6 +142,14 @@ end
 -- item you do not own still wins its slot and that slot then keeps whatever
 -- was already equipped. This picks the best piece you really have instead.
 -- Returns false, changing nothing, if the bags could not be read.
+-- Ring1 before Ring2 and Ear1 before Ear2, so a paired slot does not claim
+-- an item the other one already took. pairs() has no defined order, which is
+-- why the order is spelled out.
+local SlotOrder = {
+    'Main', 'Sub', 'Range', 'Ammo', 'Head', 'Neck', 'Ear1', 'Ear2',
+    'Body', 'Hands', 'Ring1', 'Ring2', 'Back', 'Waist', 'Legs', 'Feet',
+};
+
 profile.EvaluateOwned = function(sets, level)
     local owned, found = GetOwnedItems();
 
@@ -152,31 +166,36 @@ profile.EvaluateOwned = function(sets, level)
     for name, set in pairs(sets) do
         if (#name > 9) and (string.sub(name, -9) == '_Priority') then
             local resolved = {};
-            for slot, entries in pairs(set) do
-                if (gData.Constants.EquipSlots[slot] ~= nil) then
-                    if (type(entries) == 'string') then
+            local claimed = {};
+
+            for _, slot in ipairs(SlotOrder) do
+                local entries = set[slot];
+                if (type(entries) == 'string') then
+                    resolved[slot] = entries;
+                elseif (type(entries) == 'table') then
+                    if (entries[1] == nil) then
                         resolved[slot] = entries;
-                    elseif (type(entries) == 'table') then
-                        if (entries[1] == nil) then
-                            resolved[slot] = entries;
-                        else
-                            for _, entry in ipairs(entries) do
-                                local itemName = entry;
-                                if (type(entry) == 'table') then
-                                    itemName = entry.Name;
-                                end
-                                if (type(itemName) == 'string') then
-                                    local required = owned[string.lower(itemName)];
-                                    if (required ~= nil) and (level >= required) then
-                                        resolved[slot] = entry;
-                                        break;
-                                    end
+                    else
+                        for _, entry in ipairs(entries) do
+                            local itemName = entry;
+                            if (type(entry) == 'table') then
+                                itemName = entry.Name;
+                            end
+                            if (type(itemName) == 'string') then
+                                local key = string.lower(itemName);
+                                local carried = owned[key];
+                                if (carried ~= nil) and (level >= carried.Level)
+                                   and (carried.Count > (claimed[key] or 0)) then
+                                    resolved[slot] = entry;
+                                    claimed[key] = (claimed[key] or 0) + 1;
+                                    break;
                                 end
                             end
                         end
                     end
                 end
             end
+
             buffer[string.sub(name, 1, -10)] = resolved;
         end
     end
