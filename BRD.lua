@@ -80,6 +80,9 @@ sets = {
              'Mgn. F Ledelsens', 'Mgn. M Ledelsens', 'Garrison Boots', 'Power Sandals',
              'Fine Ledelsens' },
     },
+    -- With a white mage subjob the chest is Gaudy Harness: its latent gives
+    -- refresh while MP is under 49, which is worth more than the small
+    -- amounts of hate or HP the generated entries below it save.
     ['Pulling_WHM_Priority'] = {
         Main  = { 'Terra\'s Staff', 'Earth Staff' },
         Ammo  = { 'Pebble' },
@@ -104,7 +107,7 @@ sets = {
              'Genius Earring +1', 'Grace Earring +1', 'Alc. Earring +1', 'Aura Earring +1',
              'Deft Earring +1', 'Mecurial Earring', 'Blc. Earring +1', 'Crg. Earring +1',
              'Energy Earring +1' },
-        Body  = { 'Akinji Peti', 'Jaridah Peti', 'Hydra Doublet', 'Raven Jupon',
+        Body  = { 'Gaudy Harness', 'Akinji Peti', 'Jaridah Peti', 'Hydra Doublet', 'Raven Jupon',
              'Valkyrie\'s Coat', 'Shadow Coat', 'Enlil\'s Gambison', 'Assault Jerkin',
              'Northern Jerkin', 'Tundra Jerkin', 'Dino Jerkin', 'Raptor Jerkin',
              'Wool Gambison', 'Cuir Bouilli', 'Cuir Bouilli +1', 'Wool Robe', 'Wool Robe +1',
