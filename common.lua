@@ -31,9 +31,38 @@ local sets = {
 };
 profile.Sets = sets;
 
+
+-- Lockstyle. The command is queued a few seconds after the profile loads
+-- rather than immediately: a profile load happens on job change and on
+-- zoning, and the client ignores the command while it is still settling.
+-- ApplyLockStyle rides along with EvalLevel, which every job calls each
+-- tick, so a job only has to ask for it once in OnLoad.
+local LockStyleSet = nil;
+local LockStyleAt = 0;
+
+profile.RequestLockStyle = function(set)
+    if (set == nil) then
+        return;
+    end
+
+    LockStyleSet = set;
+    LockStyleAt = os.time() + 5;
+end
+
+local ApplyLockStyle = function()
+    if (LockStyleSet == nil) or (os.time() < LockStyleAt) then
+        return;
+    end
+
+    AshitaCore:GetChatManager():QueueCommand(-1, '/lockstyleset ' .. tostring(LockStyleSet));
+    LockStyleSet = nil;
+end
+
 profile.EvalLevel = function(level)
 	-- Evaluate Level Sync
     profile.EvaluateGear(profile.Sets, level);
+
+    ApplyLockStyle();
 end
 
 profile.SetMeleeOptions = function(option)
