@@ -65,6 +65,9 @@ profile.OnUnload = function()
 end
 
 profile.HandleCommand = function(args)
+    -- Handle utility settings
+    utility.SetOptions(args[1]);
+
     if (args[1] == 'acc') then
         if (Settings.UseAccuracy) then
             Settings.UseAccuracy = false;
@@ -89,7 +92,7 @@ profile.HandleDefault = function()
 	evalLevel();
 	
 	if (player.Status == 'Engaged') then
-		gFunc.EquipSet(common.Dream);
+		gFunc.EquipSet(common.Sets.Dream);
 		gFunc.EquipSet(sets.TP);
 
 		-- Dual Weild
@@ -108,6 +111,8 @@ profile.HandleDefault = function()
 	end
 	if (player.Status == 'Idle') then
 	end
+
+	utility.EquipSet();
 end
 
 profile.HandleAbility = function()

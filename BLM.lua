@@ -32,11 +32,13 @@ profile.HandleDefault = function()
 	local player = gData.GetPlayer();
 	
 	if (player.Status == 'Engaged') then
-		gFunc.EquipSet(common.Dream);
+		gFunc.EquipSet(common.Sets.Dream);
 	end
 	if (player.Status == 'Idle') then
-		gFunc.EquipSet(common.Dream);
+		gFunc.EquipSet(common.Sets.Dream);
 	end
+
+	utility.EquipSet();
 end
 
 profile.HandleAbility = function()

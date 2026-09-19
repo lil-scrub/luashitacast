@@ -95,7 +95,7 @@ profile.HandleDefault = function()
 
 	evalLevel();
 	
-	gFunc.EquipSet(common.Dream);
+	gFunc.EquipSet(common.Sets.Dream);
 
 	if (player.SubJob == 'WHM') then
 		gFunc.EquipSet(profile.Sets.Pulling_WHM);
