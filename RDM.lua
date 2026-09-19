@@ -14,14 +14,18 @@ profile.Packer = {
 
 profile.OnLoad = function()
     gSettings.AllowAddSet = true;
+    AshitaCore:GetChatManager():QueueCommand(-1, '/alias /rdm /lac fwd');
 
     AshitaCore:GetChatManager():QueueCommand(-1, '/macro book ' .. Settings.MacroBook);
 end
 
 profile.OnUnload = function()
+    AshitaCore:GetChatManager():QueueCommand(-1, '/alias delete /rdm');
 end
 
 profile.HandleCommand = function(args)
+    -- Handle utiility settings
+    utility.SetOptions(args[1], Settings.MacroBook);
 end
 
 profile.HandleDefault = function()
