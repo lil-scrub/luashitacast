@@ -30,21 +30,50 @@ local sets = {
     },
 };
 
+-- LuAshitacast only ever equips: a slot keeps its piece until something else
+-- replaces it, so switching an option off leaves its gear on. These clear the
+-- slot once when the option is turned off.
+local clearSets = {
+    ['Chariot']   = { Ring1 = '' },
+    ['WarpClub']  = { Main = '' },
+    ['Sneak']     = { Feet = '' },
+    ['Invisible'] = { Hands = '' },
+};
+
+-- Clearing happens at the moment the option is switched off rather than being
+-- deferred a tick: a deferred clear runs after the job has already refilled
+-- the slot, and would strip the piece the job just put there.
+local function releaseSet(name)
+    gFunc.EquipSet(clearSets[name]);
+end
+
 profile.SetOptions = function(option, arg)
     if (option == 'exp') then
         Settings.UseExperience = not Settings.UseExperience;
+        if (not Settings.UseExperience) then
+            releaseSet('Chariot');
+        end
         gFunc.Message('use experience set: ' .. tostring(Settings.UseExperience));
     end
     if (option == 'warp') then
         Settings.UseWarp = not Settings.UseWarp;
+        if (not Settings.UseWarp) then
+            releaseSet('WarpClub');
+        end
         gFunc.Message('use warp set: ' .. tostring(Settings.UseWarp));
     end
     if (option == 'sneak') then
         Settings.UseSneak = not Settings.UseSneak;
+        if (not Settings.UseSneak) then
+            releaseSet('Sneak');
+        end
         gFunc.Message('use sneak set: ' .. tostring(Settings.UseSneak));
     end
     if (option == 'invis') then
         Settings.UseInvis = not Settings.UseInvis;
+        if (not Settings.UseInvis) then
+            releaseSet('Invisible');
+        end
         gFunc.Message('use invis set: ' .. tostring(Settings.UseInvis));
     end
     if (option == 'fish') then
@@ -62,6 +91,7 @@ profile.EquipSet = function()
         if (Settings.ExperienceUsed) then
             Settings.UseExperience = false;
             Settings.ExperienceUsed = false;
+            releaseSet('Chariot');
             gFunc.Message('experience ring used: releasing ring slot');
         else
             gFunc.EquipSet(sets.Chariot);
