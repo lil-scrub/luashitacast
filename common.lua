@@ -65,7 +65,25 @@ end
 -- character is actually carrying, as a map of lowercased item name to the
 -- level the item requires. Names come back as ShiftJIS bytes, which are
 -- byte-identical to ASCII for the gear names these profiles use.
+-- One scan is reused for a few seconds. A job may resolve several set tables
+-- in the same tick (its own gear, its songs, the staves), and walking every
+-- bag once per table is wasted work.
+local scanCache, scanCount, scanAt = {}, 0, -100;
+
+-- Drop the cached scan so the next call walks the bags again. A forced
+-- refresh must see gear acquired a moment ago, not the last scan.
+local InvalidateScan = function()
+    scanCount = 0;
+    scanAt = -100;
+end
+profile.InvalidateScan = InvalidateScan;
+
 local GetOwnedItems = function()
+    local now = os.time();
+    if ((now - scanAt) < 3) and (scanCount > 0) then
+        return scanCache, scanCount;
+    end
+
     local owned = {};
     local found = 0;
     local inventory = AshitaCore:GetMemoryManager():GetInventory();
@@ -86,6 +104,8 @@ local GetOwnedItems = function()
             end
         end
     end
+
+    scanCache, scanCount, scanAt = owned, found, now;
 
     return owned, found;
 end
@@ -162,6 +182,9 @@ profile.EvaluateGear = function(sets, level, force)
     end
 
     if (force) or (level ~= state.Level) then
+        if (force) then
+            InvalidateScan();
+        end
         state.Resolved = false;
         state.Last = 0;
         state.Level = level;
