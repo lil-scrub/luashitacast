@@ -5,6 +5,7 @@ local Settings = {
     UseExperience = false,
     ExperienceUsed = false,
     UseWarp = false,
+    UseClam = false,
 	UseSneak = false,
 	UseInvis = false,
 };
@@ -28,6 +29,13 @@ local sets = {
     ['WarpClub'] = {
         Main = 'Warp Cudgel'
     },
+    -- Mithra Shorts +1 improve clamming results; Savage Top +1 carries the
+    -- enchantment that teleports to Purgonorgo Isle. Both block a
+    -- neighbouring slot: the top blocks hands, the shorts block feet.
+    ['Clam'] = {
+        Body = 'Savage Top +1',
+        Legs = 'Mithra Shorts +1',
+    },
 };
 
 -- LuAshitacast only ever equips: a slot keeps its piece until something else
@@ -38,6 +46,7 @@ local clearSets = {
     ['WarpClub']  = { Main = '' },
     ['Sneak']     = { Feet = '' },
     ['Invisible'] = { Hands = '' },
+    ['Clam']      = { Body = '', Legs = '' },
 };
 
 -- Clearing happens at the moment the option is switched off rather than being
@@ -76,6 +85,13 @@ profile.SetOptions = function(option, arg)
         end
         gFunc.Message('use invis set: ' .. tostring(Settings.UseInvis));
     end
+    if (option == 'clam') then
+        Settings.UseClam = not Settings.UseClam;
+        if (not Settings.UseClam) then
+            releaseSet('Clam');
+        end
+        gFunc.Message('use clamming set: ' .. tostring(Settings.UseClam));
+    end
     if (option == 'fish') then
         fishing.Toggle(arg);
     end
@@ -101,6 +117,11 @@ profile.EquipSet = function()
     -- Warp Club
     if (Settings.UseWarp) then
         gFunc.EquipSet(sets.WarpClub);
+    end
+
+    -- Clamming
+    if (Settings.UseClam) then
+        gFunc.EquipSet(sets.Clam);
     end
 
 	-- Sneak Boots
