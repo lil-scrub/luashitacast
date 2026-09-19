@@ -5,7 +5,6 @@ local common = gFunc.LoadFile('./common.lua');
 
 local Settings = {
 	CurrentLevel = 0,
-	UseAccuracy = false,
 	UseDW = false,
 };
 
@@ -16,22 +15,6 @@ sets = {
 		Hands = {'Ryl.Ftm. Gloves'},
 		Legs = {'Chain Hose', 'Bone Subligar +1', 'Scale Cuisses'},
         Feet = {'Leaping Boots'},
-    },
-    ['Att_Priority'] = {
-        Ring1 = {'Courage Ring'},
-        Ring2 = {'Courage Ring'},
-        Neck = {'Spike Necklace'},
-        Waist = {'Brave Belt'},
-        Ear1 = {'Bone Earring +1'},
-        Ear2 = {'Bone Earring +1'},
-    },
-    ['Acc_Priority'] = {
-        Ring1 = {'Balance Ring'},
-        Ring2 = {'Balance Ring'},
-        Neck = {'Spike Necklace'},
-        Waist = {'Life Belt'},
-        Ear1 = {'Bone Earring +1'},
-        Ear2 = {'Bone Earring +1'},
     },
 	['Weapon_Priority'] = {
 		Main = {'Moth Axe', 'Inferno Axe'},
@@ -47,12 +30,12 @@ profile.Packer = {
 };
 
 evalLevel = function()
-	-- Evaluate Level Sync
-    local myLevel = AshitaCore:GetMemoryManager():GetPlayer():GetMainJobLevel();
-    if (myLevel ~= Settings.CurrentLevel) then
-        gFunc.EvaluateLevels(profile.Sets, myLevel);
-        Settings.CurrentLevel = myLevel;
-	end
+	-- Resolve sets against level and what is actually in the bags
+    local level = AshitaCore:GetMemoryManager():GetPlayer():GetMainJobLevel();
+    Settings.CurrentLevel = level;
+    common.EvaluateGear(profile.Sets, level);
+
+    common.EvalLevel(level);
 end
 
 profile.OnLoad = function()
@@ -68,14 +51,15 @@ profile.HandleCommand = function(args)
     -- Handle utility settings
     utility.SetOptions(args[1]);
 
-    if (args[1] == 'acc') then
-        if (Settings.UseAccuracy) then
-            Settings.UseAccuracy = false;
-        else
-            Settings.UseAccuracy = true;
-        end
-        gFunc.Message('Use Accuracy Set: ' .. tostring(Settings.UseAccuracy));
+    -- Handle common settings
+    common.SetMeleeOptions(args[1]);
+
+    -- Rescan the bags and re-resolve every gear set
+    if (args[1] == 'gear') then
+        common.EvaluateGear(profile.Sets, Settings.CurrentLevel, true);
+        common.ReportGear(profile.Sets, Settings.CurrentLevel);
     end
+
     if (args[1] == 'dw') then
         if (Settings.UseDW) then
             Settings.UseDW = false;
@@ -103,11 +87,7 @@ profile.HandleDefault = function()
 		end
 		
 		-- Accuracy
-        if (Settings.UseAccuracy) then
-            gFunc.EquipSet(sets.Acc);
-        else
-            gFunc.EquipSet(sets.Att);
-        end
+		common.EquipMelee();
 	end
 	if (player.Status == 'Idle') then
 	end
