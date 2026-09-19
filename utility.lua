@@ -3,6 +3,7 @@ local profile = {};
 
 local Settings = {
     UseExperience = false,
+    ExperienceUsed = false,
     UseWarp = false,
 	UseSneak = false,
 	UseInvis = false,
@@ -55,9 +56,16 @@ profile.EquipSet = function()
     -- Fishing
     fishing.EquipSet();
 
-    -- Experience
+    -- Experience. The ring only needs to be worn long enough to use it;
+    -- once used the bonus is active and the slot is better spent elsewhere.
     if (Settings.UseExperience) then
-        gFunc.EquipSet(sets.Chariot);
+        if (Settings.ExperienceUsed) then
+            Settings.UseExperience = false;
+            Settings.ExperienceUsed = false;
+            gFunc.Message('experience ring used: releasing ring slot');
+        else
+            gFunc.EquipSet(sets.Chariot);
+        end
     end
     
     -- Warp Club
@@ -79,6 +87,12 @@ end
 
 
 profile.CheckItem = function(name)
+	if (name == 'Chariot Band') then
+		gFunc.EquipSet(sets.Chariot);
+		if (Settings.UseExperience) then
+			Settings.ExperienceUsed = true;
+		end
+	end
 	if (name == 'Selbina Milk') then
 		gFunc.EquipSet(sets.Milk);
 	end
