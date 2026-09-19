@@ -33,11 +33,11 @@ end
 
 profile.OnLoad = function()
     gSettings.AllowAddSet = true;
-	AshitaCore:GetChatManager():QueueCommand(-1, '/alias /drg /lac fwd');
+	AshitaCore:GetChatManager():QueueCommand(-1, '/alias /thf /lac fwd');
 end
 
 profile.OnUnload = function()
-	AshitaCore:GetChatManager():QueueCommand(-1, '/alias delete /drg');
+	AshitaCore:GetChatManager():QueueCommand(-1, '/alias delete /thf');
 end
 
 profile.HandleCommand = function(args)
