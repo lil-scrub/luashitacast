@@ -1,59 +1,41 @@
-profile = {};
+local profile = {};
 
-local elements = {
-    ['Light'] = {
-        staff  = "Apollo's Staff",
-        spells = {'Cure', 'Curaga', 'Cursna', 'Raise', 'Reraise', 'Banish', 'Holy',
-                  'Regen', 'Protect', 'Shell', 'Phalanx', 'Erase', 'Barblind',
-                  'Dia', 'Paralyze', 'Aurorastorm',
-                  'Lullaby', 'Finale'},
-    },
-    ['Dark'] = {
-        staff  = 'Dark Staff',
-        spells = {'Aspir', 'Drain', 'Bio', 'Blind', 'Sleep', 'Dispel',
-                  'Frazzle', 'Warp', 'Escape', 'Voidstorm'},
-    },
-    ['Earth'] = {
-        staff  = 'Earth Staff',
-        spells = {'Stone', 'Stonega', 'Quake', 'Stoneskin', 'Enstone', 'Barthunder',
-                  'Slow', 'Break', 'Sandstorm'},
-    },
-    ['Water'] = {
-        staff  = 'Water Staff',
-        spells = {'Water', 'Waterga', 'Flood', 'Enwater', 'Barfire', 'Baramnesia',
-                  'Barvirus', 'Poison', 'Rainstorm'},
-    },
-    ['Fire'] = {
-        staff  = 'Fire Staff',
-        spells = {'Fire', 'Firaga', 'Flare', 'Enfire', 'Barblizzard', 'Addle', 'Firestorm'},
-    },
-    ['Wind'] = {
-        staff  = 'Wind Staff',
-        spells = {'Aero', 'Aeroga', 'Tornado', 'Enaero', 'Barsleep', 'Barstone',
-                  'Barpetrify', 'Haste', 'Blink', 'Sneak', 'Invisible', 'Gravity',
-                  'Silence', 'Flurry', 'Windstorm'},
-    },
-    ['Ice'] = {
-        staff  = 'Ice Staff',
-        spells = {'Blizzard', 'Blizzaga', 'Freeze', 'Enblizzard', 'Baraero',
-                  'Ice Spikes', 'Bind', 'Distract', 'Hailstorm'},
-    },
-    ['Thunder'] = {
-        staff  = 'Thunder Staff',
-        spells = {'Thunder', 'Thundaga', 'Burst', 'Enthunder', 'Barpoison',
-                  'Barwater', 'Shock Spikes', 'Thunderstorm'},
-    },
-}
+-- Elemental staves keyed by the element string LuAshitacast resolves from
+-- the game's own spell resource (gData.Constants.SpellElements).
+local staves = {
+    ['Fire']    = 'Fire Staff',
+    ['Ice']     = 'Ice Staff',
+    ['Wind']    = 'Wind Staff',
+    ['Earth']   = 'Earth Staff',
+    ['Thunder'] = 'Thunder Staff',
+    ['Water']   = 'Water Staff',
+    ['Light']   = "Apollo's Staff",
+    ['Dark']    = 'Dark Staff',
+};
+profile.Staves = staves;
 
-profile.EquipStaff = function(name)
-    for _, data in pairs(elements) do
-        for _, keyword in ipairs(data.spells) do
-            if string.match(name, keyword) then
-                gFunc.EquipSet({ Main = data.staff })
-                return
-            end
-        end
+-- Equip the staff matching the element of the action being cast.
+-- Takes the table from gData.GetAction(). Abilities carry no element, and
+-- 'Non-Elemental' spells have no staff, so both leave the weapon alone.
+profile.EquipStaff = function(action)
+    if (action == nil) then
+        return;
     end
+
+    local staff = staves[action.Element];
+    if (staff ~= nil) then
+        gFunc.EquipSet({ Main = staff });
+    end
+end
+
+-- Earth staff while idle, for damage reduction.
+profile.EquipIdleStaff = function()
+    gFunc.EquipSet({ Main = staves.Earth });
+end
+
+-- Dark staff while resting.
+profile.EquipRestingStaff = function()
+    gFunc.EquipSet({ Main = staves.Dark });
 end
 
 return profile;

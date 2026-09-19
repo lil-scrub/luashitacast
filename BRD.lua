@@ -151,7 +151,7 @@ profile.HandleMidcast = function()
 		end
 	end
 
-	staves.EquipStaff(action.Name);
+	staves.EquipStaff(action);
 
 end
 
