@@ -7,7 +7,364 @@ local Settings = {
     CurrentLevel = 0,
 };
 
-sets = {};
+-- Gear candidates pulled from the HorizonXI wiki: every piece SMN can wear,
+-- scored per set and spread across the level bands so each list resolves now
+-- and upgrades itself while levelling. Levels are noted after each line.
+-- Almost none of this applies at low level -- the sets fill in as the job
+-- climbs. Resolution is ownership-aware, so unowned entries cost nothing.
+sets = {
+    -- Out of combat and while an avatar is out: perpetuation cost first, then refresh and MP. The Earth staff goes on top.
+    ['Idle_Priority'] = {
+        Head  = { 'Summoner\'s Horn +1', 'Summoner\'s Horn', 'Wivre Hairpin +1',
+             'Wivre Hairpin', 'Curate\'s Hat', 'Electrum Hairpin', 'Mana Circlet', 'Rain Hat',
+             'Magi Hat', 'Silken Hat', 'Trump Crown', 'Federation Headgear', 'Namru\'s Tiara',
+             'Windurstian Headgear', 'Shell Hairpin', 'Enlil\'s Tiara', 'Ea\'s Tiara',
+             'Bonze\'s Circlet', 'Anu\'s Tiara', 'Yigit Turban', 'Blissful Chapeau' },
+        Neck  = { 'Fenrir\'s Torque', 'Chi Necklace', 'Beak Necklace',
+             'Merrow No. 17\'s Locket', 'Grandiose Chain', 'Spirit Torque', 'Holy Phial',
+             'Mohbwa Scarf +1', 'Republican Iron Medal', 'Mohbwa Scarf',
+             'Republican Bronze Medal', 'Morgana\'s Choker', 'Purgatory Collar',
+             'Star Necklace', 'Pachamac\'s Collar', 'Promise Badge', 'Shield Pendant',
+             'Tiger Stole', 'Hemp Gorget', 'Bird Whistle', 'Green Scarf' },
+        Ear1  = { 'Celestial Earring', 'Magnetic Earring', 'Gamma Earring', 'Insomnia Earring',
+             'Hades Earring +1', 'Death Earring', 'Mana Earring +1', 'Aura Earring +1',
+             'Bat Earring', 'Geist Earring', 'Aura Earring', 'Energy Earring +1',
+             'Valor Earring', 'Ethereal Earring', 'Refresh Earring', 'Astral Earring',
+             'Intruder Earring', 'Shield Earring', 'Mecurial Earring', 'Cassie Earring' },
+        Ear2  = { 'Celestial Earring', 'Magnetic Earring', 'Gamma Earring', 'Insomnia Earring',
+             'Hades Earring +1', 'Death Earring', 'Mana Earring +1', 'Aura Earring +1',
+             'Bat Earring', 'Geist Earring', 'Aura Earring', 'Energy Earring +1',
+             'Valor Earring', 'Ethereal Earring', 'Refresh Earring', 'Astral Earring',
+             'Intruder Earring', 'Shield Earring', 'Mecurial Earring', 'Cassie Earring' },
+        Body  = { 'Summoner\'s Doublet +1', 'Summoner\'s Doublet', 'Penance Robe',
+             'Austere Robe', 'Royal Squire\'s Robe +1', 'Royal Squire\'s Robe +2',
+             'Seer\'s Tunic +1', 'Pyro Robe', 'Seer\'s Tunic', 'Marduk\'s Jubbah',
+             'Kingdom Tunic', 'Magna Bodice', 'Magna Jerkin', 'San d\'Orian Tunic',
+             'Mage\'s Robe', 'Silk Cloak +1', 'Minstrel\'s Coat', 'Aketon', 'Duende Cotehardie',
+             'Faerie Tunic', 'Mana Tunic' },
+        Hands = { 'Nashira Gages', 'Dune Bracers', 'Wood Gauntlets', 'Wood Gloves',
+             'Magical Mitts', 'Magi Cuffs', 'Silken Cuffs', 'New Moon Armlets',
+             'Devotee\'s Mitts', 'Zealot\'s Mitts', 'Custom F Gloves', 'Custom M Gloves',
+             'Zenith Mitts', 'Yigit Gages', 'Wool Bracers', 'Combat Caster\'s Mitts +1',
+             'Combat Caster\'s Mitts +2', 'Mage\'s Cuffs', 'Velvet Cuffs', 'Scentless Armlets',
+             'Angler\'s Gloves' },
+        Ring1 = { 'Evoker\'s Ring', 'Dark Ring', 'Electrum Ring', 'Carect Ring', 'Water Ring',
+             'Horizon Ring', 'Fasting Ring', 'Mystic Ring +1', 'Aura Ring +1', 'Aura Ring',
+             'Energy Ring +1', 'Black Ring', 'Light Ring', 'Bloodbead Ring', 'Vivian Ring',
+             'Peace Ring', 'Gold Ring', 'Gold Ring +1', 'Mythril Ring', 'Mythril Ring +1',
+             'Poisona Ring' },
+        Ring2 = { 'Evoker\'s Ring', 'Dark Ring', 'Electrum Ring', 'Carect Ring', 'Water Ring',
+             'Horizon Ring', 'Fasting Ring', 'Mystic Ring +1', 'Aura Ring +1', 'Aura Ring',
+             'Energy Ring +1', 'Black Ring', 'Light Ring', 'Bloodbead Ring', 'Vivian Ring',
+             'Peace Ring', 'Gold Ring', 'Gold Ring +1', 'Mythril Ring', 'Mythril Ring +1',
+             'Poisona Ring' },
+        Back  = { 'Intensifying Cape', 'Storm Cape', 'Blue Cape +1', 'Blue Cape',
+             'Aurora Mantle +1', 'Talisman Cape', 'Prism Cape', 'Aurora Mantle', 'Rainbow Cape',
+             'Esoteric Mantle', 'Lucent Cape', 'Federal Army Mantle', 'Tundra Mantle',
+             'Aries Mantle', 'Black Cape', 'Black Cape +1', 'Variable Cape', 'Cotton Cape',
+             'Cotton Cape +1' },
+        Waist = { 'Lambda Sash', 'Desert Stone', 'Forest Stone', 'Jungle Stone',
+             'Immortal\'s Sash', 'Powerful Rope', 'Al Zahbi Sash', 'Lieutenant\'s Sash',
+             'Spectral Belt', 'Hojutsu Belt', 'Mohbwa Sash', 'Adept\'s Rope', 'Oracle\'s Belt',
+             'Shaman\'s Belt', 'Magic Belt +1', 'Friar\'s Rope', 'Force Belt', 'Magic Belt',
+             'Penitent\'s Rope', 'Mantra Belt', 'Tathlum Belt' },
+        Legs  = { 'Yigit Seraweels', 'Frog Trousers', 'Combat Caster\'s Slacks +2',
+             'Combat Caster\'s Slacks +1', 'Magna F Chausses', 'Magna M Chausses', 'Magi Slops',
+             'Silken Slops', 'Seer\'s Slacks +1', 'Seer\'s Slacks', 'Sturdy Slacks',
+             'Federation Slops', 'Mage\'s Slops', 'Ea\'s Brais', 'Anu\'s Brais',
+             'Aries Subligar', 'Zenith Slacks', 'Zenith Slacks +1', 'Druid\'s Slops',
+             'Silk Slacks', 'Silk Slacks +1' },
+        Feet  = { 'Evoker\'s Pigaches +1', 'Rostrum Pumps', 'Ataractic Solea',
+             'Evoker\'s Pigaches', 'Magi Pigaches', 'Inferno Sabots +1', 'Silken Pigaches',
+             'Mannequin Pumps', 'Custom F Boots', 'Custom M Boots', 'Inferno Sabots',
+             'Kingdom Clogs', 'Enlil\'s Crackows', 'Anu\'s Gaiters', 'Yigit Crackows',
+             'Creek F Clomps', 'Creek M Clomps', 'Wool Socks', 'Ebony Sabots', 'Garrison Boots',
+             'Power Sandals' },
+    },
+    -- Fast cast, worn during the precast phase of every spell.
+    ['Precast_Priority'] = {
+        Ear1  = { 'Loquacious Earring' },
+        Ear2  = { 'Loquacious Earring' },
+        Body  = { 'Marduk\'s Jubbah' },
+        Feet  = { 'Rostrum Pumps' },
+    },
+    -- Worn while calling an avatar -- summoning magic skill.
+    ['Summon_Priority'] = {
+        Head  = { 'Marduk\'s Tiara', 'Evoker\'s Horn +1', 'Elite Beret', 'Curate\'s Hat',
+             'Wivre Hairpin', 'Evoker\'s Horn', 'Magi Hat', 'Austere Hat', 'Penance Hat',
+             'Namru\'s Tiara', 'Rain Hat', 'Electrum Hairpin', 'Enlil\'s Tiara',
+             'Federation Headgear', 'Windurstian Headgear', 'Ea\'s Tiara', 'Blissful Chapeau',
+             'Silver Hairpin', 'Bonze\'s Circlet', 'Anu\'s Tiara', 'Shell Hairpin' },
+        Neck  = { 'Chi Necklace', 'Fenrir\'s Torque', 'Morgana\'s Choker', 'Summoning Torque',
+             'Merrow No. 17\'s Locket', 'Purgatory Collar', 'Star Necklace',
+             'Republican Mythril Medal', 'Pachamac\'s Collar', 'Mohbwa Scarf',
+             'Mohbwa Scarf +1', 'Spirit Torque', 'Shield Pendant', 'Republican Iron Medal',
+             'Holy Phial', 'Republican Bronze Medal' },
+        Ear1  = { 'Gamma Earring', 'Loquacious Earring', 'Ethereal Earring',
+             'Celestial Earring', 'Death Earring', 'Hades Earring', 'Bat Earring',
+             'Desamilion Earring', 'Gayanj\'s Earring', 'Boroka Earring', 'Mana Earring',
+             'Mana Earring +1', 'Geist Earring', 'Summoning Earring', 'Aura Earring',
+             'Shield Earring', 'Valor Earring', 'Energy Earring', 'Energy Earring +1' },
+        Ear2  = { 'Gamma Earring', 'Loquacious Earring', 'Ethereal Earring',
+             'Celestial Earring', 'Death Earring', 'Hades Earring', 'Bat Earring',
+             'Desamilion Earring', 'Gayanj\'s Earring', 'Boroka Earring', 'Mana Earring',
+             'Mana Earring +1', 'Geist Earring', 'Summoning Earring', 'Aura Earring',
+             'Shield Earring', 'Valor Earring', 'Energy Earring', 'Energy Earring +1' },
+        Body  = { 'Summoner\'s Doublet +1', 'Goliard Saio', 'Summoner\'s Doublet',
+             'Black Cotehardie', 'Austere Robe', 'Penance Robe', 'Pyro Robe',
+             'Royal Squire\'s Robe +1', 'Royal Squire\'s Robe +2', 'Mage\'s Robe',
+             'Bishop\'s Robe', 'Bishop\'s Robe +1', 'Seer\'s Tunic', 'Seer\'s Tunic +1',
+             'Kingdom Tunic', 'San d\'Orian Tunic', 'Mana Tunic' },
+        Hands = { 'Summoner\'s Bracers +1', 'Carbuncle\'s Cuffs', 'Summoner\'s Bracers',
+             'Dune Bracers', 'Marine F Gloves', 'Marine M Gloves', 'Magical Mitts',
+             'Austere Cuffs', 'Penance Cuffs', 'New Moon Armlets', 'Custom F Gloves',
+             'Custom M Gloves', 'Devotee\'s Mitts', 'Zealot\'s Mitts' },
+        Ring1 = { 'Dark Ring', 'Light Ring', 'Evoker\'s Ring', 'Serene Ring', 'Ice Ring',
+             'Orichalcum Ring', 'Peace Ring', 'Zoredonite Ring', 'Mystic Ring',
+             'Kshama Ring No. 5', 'Kshama Ring No. 6', 'Kshama Ring No. 9', 'Aura Ring',
+             'Aura Ring +1', 'Black Ring', 'Carect Ring', 'Mythril Ring', 'Mythril Ring +1',
+             'Fasting Ring', 'Energy Ring', 'Energy Ring +1' },
+        Ring2 = { 'Dark Ring', 'Light Ring', 'Evoker\'s Ring', 'Serene Ring', 'Ice Ring',
+             'Orichalcum Ring', 'Peace Ring', 'Zoredonite Ring', 'Mystic Ring',
+             'Kshama Ring No. 5', 'Kshama Ring No. 6', 'Kshama Ring No. 9', 'Aura Ring',
+             'Aura Ring +1', 'Black Ring', 'Carect Ring', 'Mythril Ring', 'Mythril Ring +1',
+             'Fasting Ring', 'Energy Ring', 'Energy Ring +1' },
+        Back  = { 'Erato\'s Cape', 'Astute Cape', 'Altruistic Cape', 'Birdman Cape',
+             'Blue Cape', 'Blue Cape +1', 'Federal Army Mantle', 'Esoteric Mantle',
+             'Storm Cape', 'Aurora Mantle', 'Aurora Mantle +1', 'Lucent Cape', 'Tundra Mantle',
+             'Variable Cape', 'Talisman Cape' },
+        Waist = { 'Lambda Sash', 'Immortal\'s Sash', 'Al Zahbi Sash', 'Lieutenant\'s Sash',
+             'Spectral Belt', 'Desert Stone', 'Forest Stone', 'Jungle Stone', 'Powerful Rope',
+             'Adept\'s Rope', 'Mantra Belt', 'Oracle\'s Belt', 'Hojutsu Belt', 'Shaman\'s Belt',
+             'Force Belt', 'Mohbwa Sash', 'Magic Belt', 'Magic Belt +1', 'Friar\'s Rope' },
+        Legs  = { 'Marduk\'s Shalwar', 'Goliard Trews', 'Oracle\'s Braconi', 'Magi Slops',
+             'Austere Slops', 'Penance Slops', 'Combat Caster\'s Slacks +1',
+             'Combat Caster\'s Slacks +2', 'Frog Trousers', 'Mage\'s Slops',
+             'Enlil\'s Brayettes', 'Custom Pants', 'Seer\'s Slacks', 'Seer\'s Slacks +1',
+             'Ea\'s Brais', 'Anu\'s Brais', 'Federation Slops', 'Windurstian Slops' },
+        Feet  = { 'Marduk\'s Crackows', 'Nashira Crackows', 'Evoker\'s Pigaches +1',
+             'Ataractic Solea', 'Creek F Clomps', 'Creek M Clomps', 'Evoker\'s Pigaches',
+             'Austere Sabots', 'Penance Sabots', 'Inferno Sabots', 'Inferno Sabots +1',
+             'Enlil\'s Crackows', 'Mannequin Pumps', 'Custom F Boots', 'Custom M Boots',
+             'Elder\'s Sandals', 'Anu\'s Gaiters' },
+    },
+    -- Blood pacts -- summoning magic skill drives their potency.
+    ['BloodPact_Priority'] = {
+        Head  = { 'Marduk\'s Tiara', 'Evoker\'s Horn +1', 'Elite Beret', 'Opo-opo Crown',
+             'Mushroom Helm', 'Evoker\'s Horn', 'Super Ribbon', 'Austere Hat', 'Penance Hat',
+             'Sinister Mask', 'Bastokan Circlet', 'Republic Circlet', 'Seer\'s Crown',
+             'Seer\'s Crown +1', 'Baron\'s Chapeau', 'Erudite\'s Headband', 'Sage\'s Circlet',
+             'Eldritch Bone Hairpin' },
+        Neck  = { 'Prudence Torque', 'Jeweled Collar +1', 'Summoning Torque',
+             'Enlightened Chain', 'Stoneskin Torque', 'Torque', 'Torque +1', 'Mohbwa Scarf',
+             'Mohbwa Scarf +1', 'Black Neckerchief' },
+        Ear1  = { 'Novio Earring', 'Abyssal Earring', 'Omniscient Earring',
+             'Omniscient Earring +1', 'Phantom Earring', 'Desamilion Earring',
+             'Gayanj\'s Earring', 'Boroka Earring', 'Heims Earring', 'Summoning Earring',
+             'Morion Earring', 'Morion Earring +1', 'Cunning Earring' },
+        Ear2  = { 'Novio Earring', 'Abyssal Earring', 'Omniscient Earring',
+             'Omniscient Earring +1', 'Phantom Earring', 'Desamilion Earring',
+             'Gayanj\'s Earring', 'Boroka Earring', 'Heims Earring', 'Summoning Earring',
+             'Morion Earring', 'Morion Earring +1', 'Cunning Earring' },
+        Body  = { 'Summoner\'s Doublet +1', 'Evoker\'s Doublet +1', 'Summoner\'s Doublet',
+             'Evoker\'s Doublet', 'Austere Robe', 'Penance Robe', 'Combat Caster\'s Cloak +1',
+             'Combat Caster\'s Cloak +2', 'Royal Squire\'s Robe +1', 'Mage\'s Robe',
+             'Custom Tunic', 'Custom Vest', 'Baron\'s Saio', 'Black Tunic', 'Mage\'s Tunic',
+             'Kingdom Tunic', 'San d\'Orian Tunic', 'Royal Footman\'s Tunic' },
+        Hands = { 'Summoner\'s Bracers +1', 'Carbuncle\'s Cuffs', 'Summoner\'s Bracers',
+             'Master Caster\'s Bracelets', 'Dune Bracers', 'Marine F Gloves', 'Austere Cuffs',
+             'Penance Cuffs', 'Mage\'s Mitts', 'Engineer\'s Gloves', 'Seer\'s Mitts',
+             'Seer\'s Mitts +1', 'Devotee\'s Mitts', 'Zealot\'s Mitts' },
+        Ring1 = { 'Epsilon Ring', 'Breeze Ring', 'Evoker\'s Ring', 'Serene Ring', 'Vivian Ring',
+             'Patriarch Protector\'s Ring', 'Zoredonite Ring', 'Genius Ring', 'Genius Ring +1',
+             'Kshama Ring No. 5', 'Vilma\'s Ring', 'Goshenite Ring', 'Malfrost Ring',
+             'Wisdom Ring', 'Clear Ring', 'Knowledge Ring', 'Knowledge Ring +1' },
+        Ring2 = { 'Epsilon Ring', 'Breeze Ring', 'Evoker\'s Ring', 'Serene Ring', 'Vivian Ring',
+             'Patriarch Protector\'s Ring', 'Zoredonite Ring', 'Genius Ring', 'Genius Ring +1',
+             'Kshama Ring No. 5', 'Vilma\'s Ring', 'Goshenite Ring', 'Malfrost Ring',
+             'Wisdom Ring', 'Clear Ring', 'Knowledge Ring', 'Knowledge Ring +1' },
+        Back  = { 'Astute Cape', 'Solitaire Cape', 'Prism Cape', 'Sapient Cape',
+             'Federal Army Mantle', 'Red Cape', 'Red Cape +1', 'Black Cape', 'Black Cape +1' },
+        Waist = { 'Ksi Sash', 'Immortal\'s Sash', 'Al Zahbi Sash', 'Arachne Obi',
+             'Arachne Obi +1', 'Ice Belt', 'Desert Belt', 'Desert Stone', 'Forest Stone',
+             'Reverend Sash', 'Druid\'s Rope', 'Mantra Belt', 'Sagacious Gold Obi',
+             'Mercenary Captain\'s Belt', 'Shaman\'s Belt' },
+        Legs  = { 'Marduk\'s Shalwar', 'Summoner\'s Spats +1', 'Oracle\'s Braconi',
+             'Penance Slops', 'Austere Slops', 'Magic Slacks', 'Elder\'s Braguette',
+             'Seer\'s Slacks', 'Seer\'s Slacks +1', 'Mage\'s Slacks' },
+        Feet  = { 'Marduk\'s Crackows', 'Nashira Crackows', 'Summoner\'s Pigaches +1',
+             'Creek F Clomps', 'Creek M Clomps', 'Marine F Boots',
+             'Tactician Magician\'s Pigaches +1', 'Austere Sabots', 'Penance Sabots',
+             'Inferno Sabots', 'Inferno Sabots +1', 'Mountain Gaiters', 'Mannequin Pumps',
+             'Custom F Boots', 'Custom M Boots', 'Elder\'s Sandals', 'Garrison Boots' },
+    },
+    -- Cures from a healing subjob.
+    ['Cure_Priority'] = {
+        Head  = { 'Goliard Chapeau', 'Marduk\'s Tiara', 'Evoker\'s Horn +1', 'Opo-opo Crown',
+             'Mushroom Helm', 'Magus Keffiyeh', 'Magi Hat', 'Silk Hat +1', 'Super Ribbon',
+             'Rain Hat', 'Sinister Mask', 'Enlil\'s Tiara', 'Circe\'s Hat', 'Ea\'s Tiara',
+             'Garrison Sallet', 'Traveler\'s Hat', 'Eldritch Bone Hairpin' },
+        Neck  = { 'Colossus\'s Torque', 'Jeweled Collar +1', 'Morgana\'s Choker',
+             'Healing Torque', 'Enlightened Chain', 'Ajari Necklace', 'Stoneskin Torque',
+             'Torque', 'Promise Badge', 'Mohbwa Scarf', 'Mohbwa Scarf +1', 'Holy Phial',
+             'Fang Necklace', 'Spike Necklace', 'Justice Badge' },
+        Ear1  = { 'Static Earring', 'Celestial Earring', 'Communion Earring',
+             'Communion Earring +1', 'Ryakho\'s Earring', 'Harvest Earring', 'Geist Earring',
+             'Healing Earring' },
+        Ear2  = { 'Static Earring', 'Celestial Earring', 'Communion Earring',
+             'Communion Earring +1', 'Ryakho\'s Earring', 'Harvest Earring', 'Geist Earring',
+             'Healing Earring' },
+        Body  = { 'Nashira Manteel', 'Marduk\'s Jubbah', 'Errant Houppelande',
+             'Black Cotehardie', 'Flora Cotehardie', 'Evoker\'s Doublet',
+             'Combat Caster\'s Cloak +1', 'Combat Caster\'s Cloak +2', 'Combat Caster\'s Cloak',
+             'Bishop\'s Robe', 'Bishop\'s Robe +1', 'Enlil\'s Gambison', 'Ea\'s Doublet',
+             'Baron\'s Saio', 'Priest\'s Robe', 'Anu\'s Doublet' },
+        Hands = { 'Marduk\'s Dastanas', 'Yigit Gages', 'Master Caster\'s Bracelets',
+             'Dune Bracers', 'Marine F Gloves', 'Magi Cuffs', 'Silk Cuffs +1', 'Ivory Mitts',
+             'Enlil\'s Kolluks', 'Seer\'s Mitts', 'Seer\'s Mitts +1', 'Devotee\'s Mitts',
+             'Anu\'s Gages', 'Zealot\'s Mitts' },
+        Ring1 = { 'Pi Ring', 'Aqua Ring', 'Dark Ring', 'Serene Ring', 'Vivian Ring',
+             'Grand Knight\'s Ring', 'Aquamarine Ring', 'Serenity Ring', 'Serenity Ring +1',
+             'Kshama Ring No. 9', 'Vilma\'s Ring', 'Malflood Ring', 'Solace Ring',
+             'Solace Ring +1', 'Carect Ring', 'Lapis Lazuli Ring', 'Tranquility Ring',
+             'Saintly Ring' },
+        Ring2 = { 'Pi Ring', 'Aqua Ring', 'Dark Ring', 'Serene Ring', 'Vivian Ring',
+             'Grand Knight\'s Ring', 'Aquamarine Ring', 'Serenity Ring', 'Serenity Ring +1',
+             'Kshama Ring No. 9', 'Vilma\'s Ring', 'Malflood Ring', 'Solace Ring',
+             'Solace Ring +1', 'Carect Ring', 'Lapis Lazuli Ring', 'Tranquility Ring',
+             'Saintly Ring' },
+        Back  = { 'Altruistic Cape', 'Prism Cape', 'Rainbow Cape', 'Miraculous Cape',
+             'Sapient Cape', 'Royal Army Mantle', 'Red Cape', 'Red Cape +1', 'White Cape',
+             'White Cape +1', 'Mist Silk Cape' },
+        Waist = { 'Ksi Sash', 'Al Zahbi Sash', 'Moon Sash', 'Water Belt',
+             'Deductive Brocade Obi', 'Penitent\'s Rope', 'Twinthread Obi', 'Twinthread Obi +1',
+             'Forest Belt', 'Reverend Sash', 'Druid\'s Rope', 'Mantra Belt', 'Oracle\'s Belt',
+             'Deductive Gold Obi', 'Mercenary Captain\'s Belt', 'Friar\'s Rope' },
+        Legs  = { 'Marduk\'s Shalwar', 'Zenith Slacks', 'Zenith Slacks +1', 'Druid\'s Slops',
+             'Tactician Magician\'s Slops +1', 'Tactician Magician\'s Slops +2',
+             'Austere Slops', 'Magic Slacks', 'Custom Pants', 'Custom Slacks',
+             'Savage Loincloth' },
+        Feet  = { 'Goliard Clogs', 'Marduk\'s Crackows', 'Rostrum Pumps', 'Marine F Boots',
+             'Marine M Boots', 'River Gaiters', 'Enlil\'s Crackows', 'Mannequin Pumps',
+             'Custom F Boots', 'Custom M Boots', 'Seer\'s Pumps', 'Garrison Boots' },
+    },
+    -- Enhancing magic skill from a subjob.
+    ['Enhancing_Priority'] = {
+        Head  = { 'Goliard Chapeau', 'Marduk\'s Tiara', 'Evoker\'s Horn +1', 'Opo-opo Crown',
+             'Mushroom Helm', 'Magus Keffiyeh', 'Magi Hat', 'Silk Hat +1', 'Super Ribbon',
+             'Namru\'s Tiara', 'Rain Hat', 'Sinister Mask', 'Enlil\'s Tiara', 'Circe\'s Hat',
+             'Ea\'s Tiara', 'Garrison Sallet', 'Traveler\'s Hat', 'Eldritch Bone Hairpin' },
+        Neck  = { 'Colossus\'s Torque', 'Jeweled Collar +1', 'Morgana\'s Choker',
+             'Enhancing Torque', 'Enlightened Chain', 'Ajari Necklace', 'Stoneskin Torque',
+             'Torque', 'Promise Badge', 'Yinyang Lorgnette', 'Mohbwa Scarf', 'Holy Phial',
+             'Fang Necklace', 'Spike Necklace', 'Justice Badge' },
+        Ear1  = { 'Static Earring', 'Celestial Earring', 'Communion Earring',
+             'Communion Earring +1', 'Ryakho\'s Earring', 'Harvest Earring', 'Geist Earring',
+             'Augmenting Earring' },
+        Ear2  = { 'Static Earring', 'Celestial Earring', 'Communion Earring',
+             'Communion Earring +1', 'Ryakho\'s Earring', 'Harvest Earring', 'Geist Earring',
+             'Augmenting Earring' },
+        Body  = { 'Marduk\'s Jubbah', 'Errant Houppelande', 'Mahatma Houppelande',
+             'Black Cotehardie', 'Flora Cotehardie', 'Evoker\'s Doublet',
+             'Combat Caster\'s Cloak +1', 'Combat Caster\'s Cloak +2', 'Combat Caster\'s Cloak',
+             'Bishop\'s Robe', 'Bishop\'s Robe +1', 'Enlil\'s Gambison', 'Ea\'s Doublet',
+             'Baron\'s Saio', 'Priest\'s Robe', 'Anu\'s Doublet' },
+        Hands = { 'Marduk\'s Dastanas', 'Yigit Gages', 'Master Caster\'s Bracelets',
+             'Dune Bracers', 'Marine F Gloves', 'Magi Cuffs', 'Silk Cuffs +1', 'Ivory Mitts',
+             'Enlil\'s Kolluks', 'Seer\'s Mitts', 'Seer\'s Mitts +1', 'Devotee\'s Mitts',
+             'Anu\'s Gages', 'Zealot\'s Mitts' },
+        Ring1 = { 'Pi Ring', 'Aqua Ring', 'Dark Ring', 'Serene Ring', 'Vivian Ring',
+             'Grand Knight\'s Ring', 'Aquamarine Ring', 'Serenity Ring', 'Serenity Ring +1',
+             'Kshama Ring No. 9', 'Vilma\'s Ring', 'Malflood Ring', 'Solace Ring',
+             'Solace Ring +1', 'Carect Ring', 'Lapis Lazuli Ring', 'Tranquility Ring',
+             'Saintly Ring' },
+        Ring2 = { 'Pi Ring', 'Aqua Ring', 'Dark Ring', 'Serene Ring', 'Vivian Ring',
+             'Grand Knight\'s Ring', 'Aquamarine Ring', 'Serenity Ring', 'Serenity Ring +1',
+             'Kshama Ring No. 9', 'Vilma\'s Ring', 'Malflood Ring', 'Solace Ring',
+             'Solace Ring +1', 'Carect Ring', 'Lapis Lazuli Ring', 'Tranquility Ring',
+             'Saintly Ring' },
+        Back  = { 'Merciful Cape', 'Prism Cape', 'Rainbow Cape', 'Miraculous Cape',
+             'Sapient Cape', 'Royal Army Mantle', 'Red Cape', 'Red Cape +1', 'White Cape',
+             'White Cape +1', 'Mist Silk Cape' },
+        Waist = { 'Ksi Sash', 'Al Zahbi Sash', 'Moon Sash', 'Water Belt',
+             'Deductive Brocade Obi', 'Penitent\'s Rope', 'Twinthread Obi', 'Twinthread Obi +1',
+             'Forest Belt', 'Reverend Sash', 'Druid\'s Rope', 'Mantra Belt', 'Oracle\'s Belt',
+             'Deductive Gold Obi', 'Mercenary Captain\'s Belt', 'Friar\'s Rope' },
+        Legs  = { 'Zenith Slacks', 'Zenith Slacks +1', 'Errant Slops',
+             'Tactician Magician\'s Slops +1', 'Tactician Magician\'s Slops +2',
+             'Austere Slops', 'Magic Slacks', 'Custom Pants', 'Custom Slacks',
+             'Savage Loincloth' },
+        Feet  = { 'Goliard Clogs', 'Marduk\'s Crackows', 'Rostrum Pumps', 'Marine F Boots',
+             'Marine M Boots', 'River Gaiters', 'Enlil\'s Crackows', 'Mannequin Pumps',
+             'Custom F Boots', 'Custom M Boots', 'Seer\'s Pumps', 'Garrison Boots' },
+    },
+    -- Melee, worn while engaged.
+    ['TP_Priority'] = {
+        Head  = { 'Nashira Turban', 'Pineal Hat', 'Breeder Mask', 'Green Beret',
+             'Green Beret +1', 'Corsair\'s Tricorne', 'Super Ribbon', 'Storm Zucchetto',
+             'Voyager Sallet', 'Buffalo Helm', 'Spelunker\'s Hat', 'Federation Headgear',
+             'Dandy Spectacles', 'Fancy Spectacles', 'Emperor Hairpin', 'Empress Hairpin',
+             'Shepherd\'s Bonnet' },
+        Neck  = { 'Diabolos\'s Torque', 'Chanoix\'s Gorget', 'Wivre Gorget', 'Sniper\'s Collar',
+             'Grand Temple Knight\'s Collar', 'Chivalrous Chain', 'Ashura Necklace',
+             'Storm Gorget', 'Peacock Amulet', 'Peacock Charm', 'Tiger Stole', 'Fang Necklace',
+             'Spike Necklace', 'Feather Collar +1' },
+        Ear1  = { 'Beta Earring', 'Hollow Earring', 'Beastly Earring', 'Diabolos\'s Earring',
+             'Magnifying Earring', 'Minuet Earring', 'Bitter Earring', 'Accurate Earring',
+             'Vision Earring', 'Gold Earring', 'Gold Earring +1', 'Tortoise Earring',
+             'Mythril Earring +1', 'Reraise Earring', 'Beetle Earring', 'Bone Earring',
+             'Bone Earring +1', 'Optical Earring' },
+        Ear2  = { 'Beta Earring', 'Hollow Earring', 'Beastly Earring', 'Diabolos\'s Earring',
+             'Magnifying Earring', 'Minuet Earring', 'Bitter Earring', 'Accurate Earring',
+             'Vision Earring', 'Gold Earring', 'Gold Earring +1', 'Tortoise Earring',
+             'Mythril Earring +1', 'Reraise Earring', 'Beetle Earring', 'Bone Earring',
+             'Bone Earring +1', 'Optical Earring' },
+        Body  = { 'Nashira Manteel', 'Commodore Frac', 'Corsair\'s Frac +1', 'Tabin Jupon',
+             'Tabin Jupon +1', 'Battle Jupon', 'Black Cotehardie', 'Flora Cotehardie',
+             'Corsair\'s Frac', 'Iron Musketeer\'s Gambison +1',
+             'Iron Musketeer\'s Gambison +2', 'Iron Musketeer\'s Gambison',
+             'Shepherd\'s Doublet', 'Federation Doublet', 'Windurstian Doublet',
+             'Garrison Tunica' },
+        Hands = { 'Nashira Gages', 'Goliard Cuffs', 'Pantin Dastanas +1', 'Tabin Bracers',
+             'Tabin Bracers +1', 'Battle Bracers', 'Tactician Magician\'s Cuffs +1',
+             'Tactician Magician\'s Cuffs +2', 'Aiming Bracelets', 'Combat Caster\'s Mitts +1',
+             'Combat Caster\'s Mitts +2', 'Combat Caster\'s Mitts', 'Sennight Bangles',
+             'Federation Gloves', 'Windurstian Gloves', 'Custom F Gloves', 'Custom M Gloves',
+             'Magna Gauntlets', 'Battle Gloves', 'Linen Cuffs +1' },
+        Ring1 = { 'Bellona\'s Ring', 'Mars\'s Ring', 'Iota Ring', 'Marid Ring', 'Marid Ring +1',
+             'Lightning Ring', 'Toreador\'s Ring', 'Jalzahn\'s Ring', 'Ulthalam\'s Ring',
+             'Kshama Ring No. 2', 'Kshama Ring No. 8', 'Carapace Ring', 'Horn Ring',
+             'Horn Ring +1', 'Jaeger Ring', 'Bowyer Ring', 'Beetle Ring', 'Beetle Ring +1',
+             'Bone Ring', 'Bone Ring +1', 'Vision Ring' },
+        Ring2 = { 'Bellona\'s Ring', 'Mars\'s Ring', 'Iota Ring', 'Marid Ring', 'Marid Ring +1',
+             'Lightning Ring', 'Toreador\'s Ring', 'Jalzahn\'s Ring', 'Ulthalam\'s Ring',
+             'Kshama Ring No. 2', 'Kshama Ring No. 8', 'Carapace Ring', 'Horn Ring',
+             'Horn Ring +1', 'Jaeger Ring', 'Bowyer Ring', 'Beetle Ring', 'Beetle Ring +1',
+             'Bone Ring', 'Bone Ring +1', 'Vision Ring' },
+        Back  = { 'Gunner\'s Mantle', 'Republican Army Mantle', 'Bellicose Mantle',
+             'Gramary Cape', 'Rearguard Mantle' },
+        Waist = { 'Ninurta\'s Sash', 'Buccaneer\'s Belt', 'Sprinter\'s Belt', 'Mithran Stone',
+             'Bitter Corset', 'Potent Belt', 'Swift Belt', 'Ocean Belt', 'Desert Belt',
+             'Life Belt', 'Tilt Belt', 'Corsette', 'Mercenary Captain\'s Belt' },
+        Legs  = { 'Nashira Seraweels', 'Shadow Trews', 'Valkyrie\'s Trews', 'Tabin Hose',
+             'Tabin Hose +1', 'Evoker\'s Spats', 'Combat Caster\'s Slacks +1',
+             'Combat Caster\'s Slacks +2', 'Combat Caster\'s Slacks', 'Custom Pants',
+             'Custom Slacks', 'Magna F Chausses', 'Garrison Hose' },
+        Feet  = { 'Nashira Crackows', 'Goliard Clogs', 'Shadow Clogs', 'Marine F Boots',
+             'Marine M Boots', 'Creek F Clomps', 'Tabin Boots', 'Tabin Boots +1',
+             'Storm Gambieras', 'Mountain Gaiters', 'Federation Gaiters', 'Windurstian Gaiters',
+             'Custom F Boots', 'Custom M Boots', 'Savage Gaiters' },
+    },
+    -- Club, dagger and shield for soloing.
+    ['Weapon_Priority'] = {
+        Main  = { 'Scepter', 'Scepter +1', 'Reserve Captain\'s Mace',
+             'Senior Gold Musketeer\'s Rod', 'Misericorde', 'Daylight Dagger',
+             'Palladium Dagger', 'Garuda\'s Dagger', 'Curse Wand', 'Sloth Wand', 'Lust Dagger',
+             'Triple Dagger', 'Bastokan Dagger', 'Decurion\'s Dagger', 'Piercing Dagger' },
+        Sub   = { },
+    },
+};
+
 profile.Sets = sets;
 
 profile.Packer = {
@@ -49,13 +406,16 @@ profile.HandleDefault = function()
 
 	evalLevel();
 
+	gFunc.EquipSet(common.Sets.Dream);
+
 	if (player.Status == 'Engaged') then
-		gFunc.EquipSet(common.Sets.Dream);
-	end
-	if (player.Status == 'Idle') then
-		gFunc.EquipSet(common.Sets.Dream);
+		gFunc.EquipSet(sets.TP);
+		gFunc.EquipSet(sets.Weapon);
+	else
+		gFunc.EquipSet(sets.Idle);
 		staves.EquipIdleStaff();
 	end
+
 	if (player.Status == 'Resting') then
 		staves.EquipRestingStaff();
 	end
@@ -65,6 +425,13 @@ end
 
 profile.HandleAbility = function()
 	local action = gData.GetAction();
+
+	-- Blood pacts are abilities rather than spells, so they never reach
+	-- HandleMidcast. Both Rage and Ward scale with summoning magic skill.
+	if (action ~= nil) and (type(action.Type) == 'string')
+	   and (string.match(action.Type, 'Blood Pact')) then
+		gFunc.EquipSet(sets.BloodPact);
+	end
 end
 
 profile.HandleItem = function()
@@ -74,6 +441,7 @@ profile.HandleItem = function()
 end
 
 profile.HandlePrecast = function()
+	gFunc.EquipSet(sets.Precast);
 end
 
 profile.HandleMidcast = function()
@@ -81,6 +449,15 @@ profile.HandleMidcast = function()
 
 	utility.CheckCast(action.Name);
 
+	if (action.Skill == 'Summoning') then
+		gFunc.EquipSet(sets.Summon);
+	elseif (action.Skill == 'Healing Magic') then
+		gFunc.EquipSet(sets.Cure);
+	elseif (action.Skill == 'Enhancing Magic') then
+		gFunc.EquipSet(sets.Enhancing);
+	end
+
+	-- Avatars carry an element of their own, so the staff follows the summon.
 	staves.EquipStaff(action);
 end
 
