@@ -35,6 +35,11 @@ local sets = {
     ['Clam'] = {
         Body = 'Savage Top +1',
         Legs = 'Mithra Shorts +1',
+        -- The top blocks handgear and the shorts block footgear. Without
+        -- clearing these the job keeps re-equipping hands and feet every
+        -- tick and the two sets fight each other.
+        Hands = 'remove',
+        Feet = 'remove',
     },
 };
 
@@ -42,11 +47,11 @@ local sets = {
 -- replaces it, so switching an option off leaves its gear on. These clear the
 -- slot once when the option is turned off.
 local clearSets = {
-    ['Chariot']   = { Ring1 = '' },
-    ['WarpClub']  = { Main = '' },
-    ['Sneak']     = { Feet = '' },
-    ['Invisible'] = { Hands = '' },
-    ['Clam']      = { Body = '', Legs = '' },
+    ['Chariot']   = { Ring1 = 'remove' },
+    ['WarpClub']  = { Main = 'remove' },
+    ['Sneak']     = { Feet = 'remove' },
+    ['Invisible'] = { Hands = 'remove' },
+    ['Clam']      = { Body = 'remove', Legs = 'remove' },
 };
 
 -- Clearing happens at the moment the option is switched off rather than being
