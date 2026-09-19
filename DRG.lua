@@ -21,12 +21,10 @@ profile.Packer = {
 };
 
 evalLevel = function()
-	-- Evaluate Level Sync
+	-- Resolve sets against level and what is actually in the bags
     local level = AshitaCore:GetMemoryManager():GetPlayer():GetMainJobLevel();
-    if (level ~= Settings.CurrentLevel) then
-        gFunc.EvaluateLevels(profile.Sets, level);
-        Settings.CurrentLevel = level;
-	end
+    Settings.CurrentLevel = level;
+    common.EvaluateGear(profile.Sets, level);
 
     common.EvalLevel(level);
 end
@@ -41,11 +39,17 @@ profile.OnUnload = function()
 end
 
 profile.HandleCommand = function(args)
-    -- Handle utiility settings
+    -- Handle utility settings
     utility.SetOptions(args[1]);
 
     -- Handle common settings
     common.SetMeleeOptions(args[1]);
+
+    -- Rescan the bags and re-resolve every gear set
+    if (args[1] == 'gear') then
+        common.EvaluateGear(profile.Sets, Settings.CurrentLevel, true);
+        common.ReportGear(profile.Sets, Settings.CurrentLevel);
+    end
 end
 
 profile.HandleDefault = function()
