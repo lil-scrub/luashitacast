@@ -21,7 +21,9 @@ profile.Toggle = function(book)
         Settings.UseFishing = false;
         gFunc.Message('use fishing set: ' .. tostring(Settings.UseFishing));
 
-        AshitaCore:GetChatManager():QueueCommand(-1, '/macro book ' .. book);
+        if (book ~= nil) then
+            AshitaCore:GetChatManager():QueueCommand(-1, '/macro book ' .. book);
+        end
     else
         Settings.UseFishing = true;
         gFunc.Message('use fishing set: ' .. tostring(Settings.UseFishing));
