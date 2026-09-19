@@ -353,6 +353,7 @@ evalLevel = function()
     local level = AshitaCore:GetMemoryManager():GetPlayer():GetMainJobLevel();
     Settings.CurrentLevel = level;
     common.EvaluateGear(profile.Sets, level);
+    common.EvaluateGear(staves.Sets, level);
     common.EvaluateGear(profile.Songs, level);
 end
 

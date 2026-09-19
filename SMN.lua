@@ -3,11 +3,25 @@ local utility = gFunc.LoadFile('./utility.lua');
 local common = gFunc.LoadFile('./common.lua');
 local staves = gFunc.LoadFile('./staves.lua');
 
+local Settings = {
+    CurrentLevel = 0,
+};
+
 sets = {};
 profile.Sets = sets;
 
 profile.Packer = {
 };
+
+evalLevel = function()
+	-- Resolve sets against level and what is actually in the bags
+    local level = AshitaCore:GetMemoryManager():GetPlayer():GetMainJobLevel();
+    Settings.CurrentLevel = level;
+    common.EvaluateGear(profile.Sets, level);
+    common.EvaluateGear(staves.Sets, level);
+
+    common.EvalLevel(level);
+end
 
 profile.OnLoad = function()
     gSettings.AllowAddSet = true;
@@ -21,10 +35,19 @@ end
 profile.HandleCommand = function(args)
     -- Handle utility settings
     utility.SetOptions(args[1]);
+
+    -- Rescan the bags and re-resolve every gear set
+    if (args[1] == 'gear') then
+        common.EvaluateGear(profile.Sets, Settings.CurrentLevel, true);
+        common.EvaluateGear(staves.Sets, Settings.CurrentLevel, true);
+        common.ReportGear(profile.Sets, Settings.CurrentLevel);
+    end
 end
 
 profile.HandleDefault = function()
 	local player = gData.GetPlayer();
+
+	evalLevel();
 
 	if (player.Status == 'Engaged') then
 		gFunc.EquipSet(common.Sets.Dream);
