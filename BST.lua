@@ -94,6 +94,9 @@ profile.OnLoad = function()
     else
         gFunc.Message("Jug: " .. Settings.Jug);
     end
+
+    -- Lock appearance a few seconds after loading
+    common.RequestLockStyle(1);
 end
 
 profile.OnUnload = function()

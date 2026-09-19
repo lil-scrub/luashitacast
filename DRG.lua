@@ -32,6 +32,9 @@ end
 profile.OnLoad = function()
     gSettings.AllowAddSet = true;
 	AshitaCore:GetChatManager():QueueCommand(-1, '/alias /drg /lac fwd');
+
+    -- Lock appearance a few seconds after loading
+    common.RequestLockStyle(1);
 end
 
 profile.OnUnload = function()

@@ -355,6 +355,8 @@ evalLevel = function()
     common.EvaluateGear(profile.Sets, level);
     common.EvaluateGear(staves.Sets, level);
     common.EvaluateGear(profile.Songs, level);
+
+    common.EvalLevel(level);
 end
 
 -- Song families that have an instrument of their own. The names do not
@@ -393,6 +395,9 @@ profile.OnLoad = function()
 	AshitaCore:GetChatManager():QueueCommand(-1, '/alias /brd /lac fwd');
 
     AshitaCore:GetChatManager():QueueCommand(-1, '/macro book ' .. Settings.MacroBook);
+
+    -- Lock appearance a few seconds after loading
+    common.RequestLockStyle(1);
 end
 
 profile.OnUnload = function()

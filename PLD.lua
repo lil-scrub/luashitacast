@@ -45,6 +45,9 @@ profile.OnLoad = function()
 	AshitaCore:GetChatManager():QueueCommand(-1, '/alias /pld /lac fwd');
 
     AshitaCore:GetChatManager():QueueCommand(-1, '/macro book ' .. Settings.MacroBook);
+
+    -- Lock appearance a few seconds after loading
+    common.RequestLockStyle(1);
 end
 
 profile.OnUnload = function()
