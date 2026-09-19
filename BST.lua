@@ -21,22 +21,102 @@ local sets = {
         Main = {'Darksteel Pick +1', 'Barbaroi Axe'},
         Sub = {'darksteel buckler', 'Turtle Shield +1'},
 	},
+    -- Melee. Attack first, then STR, then everything else.
     ['Tp_Priority'] = {
-        Head = {'Beast Helm', 'Emperor hairpin'},
-        Body = {'Savage Seperates', 'Ryl.Sqr. Chainmail', 'Chainmail'},
-        Hands = {'Beast Gloves', 'Ryl.Ftm. Gloves'},
-        Legs = {'Beast Trousers', 'Ryl.Sqr. Breeches', 'Chain Hose'},
-        Feet = {'Beast Gaiters', 'Leaping Boots'},
+        Head  = { 'Skadi\'s Visor', 'Brigand\'s Mask', 'Aurum Armet', 'Celata', 'Celata +1',
+             'Patroclus\'s Helm', 'Akinji Khud', 'Super Ribbon', 'Shock Mask', 'Alumine Salade',
+             'Luisant Salade', 'Valkyrie\'s Mask', 'Freya\'s Mask', 'Federation Headgear',
+             'Windurstian Headgear', 'Freyr\'s Mask', 'Emperor Hairpin', 'Shepherd\'s Bonnet',
+             'Njord\'s Mask' },
+        Neck  = { 'Dream Collar', 'Qiqirn Collar', 'Diabolos\'s Torque', 'Sniper\'s Collar',
+             'Grand Temple Knight\'s Collar', 'Chivalrous Chain', 'Royal Guard\'s Collar',
+             'Royal Knight Army Collar', 'Storm Gorget', 'Peacock Amulet', 'Peacock Charm',
+             'Ajase Beads', 'Tiger Stole', 'Fang Necklace', 'Spike Necklace' },
+        Ear1  = { 'Brutal Earring', 'Orichalcum Earring', 'Triton Earring', 'Merman\'s Earring',
+             'Minuet Earring', 'Platinum Earring', 'Assault Earring', 'Fang Earring',
+             'Spike Earring', 'Gold Earring', 'Gold Earring +1', 'Tortoise Earring',
+             'Mythril Earring +1', 'Reraise Earring', 'Beetle Earring', 'Bone Earring',
+             'Bone Earring +1', 'Optical Earring' },
+        Ear2  = { 'Brutal Earring', 'Orichalcum Earring', 'Triton Earring', 'Merman\'s Earring',
+             'Minuet Earring', 'Platinum Earring', 'Assault Earring', 'Fang Earring',
+             'Spike Earring', 'Gold Earring', 'Gold Earring +1', 'Tortoise Earring',
+             'Mythril Earring +1', 'Reraise Earring', 'Beetle Earring', 'Bone Earring',
+             'Bone Earring +1', 'Optical Earring' },
+        Body  = { 'Askar Korazin', 'Io\'s Mail', 'Adaman Hauberk', 'Hauberk', 'Hauberk +1',
+             'Byrnie', 'Haubergeon', 'Haubergeon +1', 'Royal Knight\'s Chainmail',
+             'Alumine Haubert', 'Luisant Haubert', 'Iron Musketeer\'s Gambison +1',
+             'Shepherd\'s Doublet', 'Savage Separates', 'Wonder Kaftan', 'Freyr\'s Jerkin',
+             'Garrison Tunica', 'Njord\'s Jerkin' },
+        Hands = { 'Skadi\'s Bazubands', 'Aurum Gauntlets', 'Dusk Gloves', 'Thick Mufflers',
+             'Thick Mufflers +1', 'Tabin Bracers', 'Akinji Bazubands', 'Jaridah Bazubands',
+             'Spiked Finger Gauntlets', 'Alumine Moufles', 'Luisant Moufles',
+             'Ogygos\'s Bracelets', 'Freya\'s Gloves', 'Federation Gloves',
+             'Windurstian Gloves', 'Custom F Gloves', 'Custom M Gloves', 'Freyr\'s Gloves',
+             'Bastokan Mittens', 'Kingdom Gloves', 'Njord\'s Gloves' },
+        Ring1 = { 'Bellona\'s Ring', 'Mars\'s Ring', 'Cerberus Ring', 'Fire Ring',
+             'Grand Knight\'s Ring', 'Patriarch Protector\'s Ring', 'Tiger Ring',
+             'Jalzahn\'s Ring', 'Ulthalam\'s Ring', 'Kshama Ring No. 8', 'Assailant\'s Ring',
+             'Crossbowman\'s Ring', 'Garnet Ring', 'Malflame Ring', 'Rajas Ring', 'Bowyer Ring',
+             'Beetle Ring', 'Protean Ring', 'Fasting Ring', 'Mighty Ring', 'Courage Ring' },
+        Ring2 = { 'Bellona\'s Ring', 'Mars\'s Ring', 'Cerberus Ring', 'Fire Ring',
+             'Grand Knight\'s Ring', 'Patriarch Protector\'s Ring', 'Tiger Ring',
+             'Jalzahn\'s Ring', 'Ulthalam\'s Ring', 'Kshama Ring No. 8', 'Assailant\'s Ring',
+             'Crossbowman\'s Ring', 'Garnet Ring', 'Malflame Ring', 'Rajas Ring', 'Bowyer Ring',
+             'Beetle Ring', 'Protean Ring', 'Fasting Ring', 'Mighty Ring', 'Courage Ring' },
+        Back  = { 'Cerberus Mantle', 'Cerberus Mantle +1', 'Forager\'s Mantle', 'Psilos Mantle',
+             'Amemet Mantle', 'Amemet Mantle +1', 'Royal Army Mantle', 'Republican Army Mantle',
+             'Jaguar Mantle' },
+        Waist = { 'Ninurta\'s Sash', 'Buccaneer\'s Belt', 'Corsair\'s Belt', 'Sultan\'s Belt',
+             'Fire Belt', 'Potent Belt', 'Royal Knight\'s Belt +1', 'Royal Knight\'s Belt +2',
+             'Swift Belt', 'Vanguard Belt', 'Swordbelt', 'Swordbelt +1', 'Acrobat\'s Belt',
+             'Barbarian\'s Belt', 'Brave belt' },
+        Legs  = { 'Skadi\'s Chausses', 'Adaman Breeches', 'Aurum Cuisses', 'Thick Breeches',
+             'Thick Breeches +1', 'Feral Trousers', 'Royal Knight\'s Breeches',
+             'Akinji Salvars', 'Jaridah Salvars', 'Alumine Brayettes', 'Luisant Brayettes',
+             'Royal Squire\'s Breeches +1', 'Freya\'s Trousers', 'Bastokan Cuisses',
+             'Republic Cuisses', 'Freyr\'s Trousers', 'Bastokan Subligar', 'Republic Subligar',
+             'Njord\'s Trousers' },
+        Feet  = { 'Adaman Sollerets', 'Aurum Sabatons', 'Dusk Ledelsens', 'Thick Sollerets',
+             'Thick Sollerets +1', 'Rutter Sabatons', 'Abtal Boots', 'Sipahi Boots',
+             'Storm Gambieras', 'Alumine Sollerets', 'Luisant Sollerets', 'Freya\'s Ledelsens',
+             'Federation Gaiters', 'Windurstian Gaiters', 'Savage Gaiters', 'Wonder Clomps',
+             'Shepherd\'s Boots', 'Njord\'s Ledelsens', 'Bounding Boots', 'Leaping Boots' },
     },
-    ['Charm'] = {
-        Main = 'Apollo\'s Staff',
-        Head = 'Beast Helm',
-        Body = 'Beast Jackcoat',
-        Hands = 'Beast Gloves',
-        Ring1 = 'Hope Ring',
-        Ring2 = 'Hope Ring',
-        Legs = 'Beast Trousers',
-        Feet = 'Beast Gaiters',
+    -- Charm. CHR, plus gear that enhances charm outright.
+    ['Charm_Priority'] = {
+        Main  = { 'Apollo\'s Staff', 'Light Staff' },
+        Head  = { 'Monster Helm +1', 'Panther Mask', 'Monster Helm', 'Coral Cap',
+             'Merman\'s Cap', 'Opo-opo Crown', 'Beast Helm', 'Super Ribbon',
+             'Jester\'s Headband', 'Juggler\'s Headband', 'Rain Hat', 'Alluring Headband',
+             'Trump Crown', 'Garrison Sallet', 'Noble\'s Ribbon', 'Entrancing Ribbon' },
+        Neck  = { 'Temperance Torque', 'Oscar Scarf', 'Merrow No. 17\'s Locket',
+             'Star Necklace', 'Stoneskin Torque', 'Torque', 'Flower Necklace', 'Beast Whistle',
+             'Bird Whistle', 'Dog Collar' },
+        Ear1  = { 'Delta Earring', 'Epsilon Earring', 'Beastly Earring', 'Melody Earring',
+             'Melody Earring +1', 'Heims Earring' },
+        Ear2  = { 'Delta Earring', 'Epsilon Earring', 'Beastly Earring', 'Melody Earring',
+             'Melody Earring +1', 'Heims Earring' },
+        Body  = { 'Bison Jacket', 'Brave\'s Jacket', 'Khimaira Jacket', 'Byrnie', 'Byrnie +1',
+             'Black Cotehardie', 'Flora Cotehardie', 'Gaudy Harness', 'Brigandine +1',
+             'Argent Coat', 'Ceremonial Dress', 'Freya\'s Jerkin', 'Federation Doublet',
+             'Windurstian Doublet', 'Freyr\'s Jerkin', 'Garrison Tunica' },
+        Hands = { 'Pantin Dastanas +1', 'Beast Gloves +1', 'Tarasque Mitts', 'Marine F Gloves',
+             'Marine M Gloves', 'Trainer\'s Wristbands' },
+        Ring1 = { 'Dark Ring', 'Light Ring', 'Angel\'s Ring', 'Atlaua\'s Ring', 'Allure Ring',
+             'Allure Ring +1', 'Moon Ring', 'Kshama Ring No. 6', 'Vilma\'s Ring',
+             'Loyalty Ring', 'Loyalty Ring +1', 'Maldust Ring', 'Hope Ring', 'Opal Ring' },
+        Ring2 = { 'Dark Ring', 'Light Ring', 'Angel\'s Ring', 'Atlaua\'s Ring', 'Allure Ring',
+             'Allure Ring +1', 'Moon Ring', 'Kshama Ring No. 6', 'Vilma\'s Ring',
+             'Loyalty Ring', 'Loyalty Ring +1', 'Maldust Ring', 'Hope Ring', 'Opal Ring' },
+        Waist = { 'Monster Belt', 'Czar\'s Belt', 'Kaiser Belt', 'Koenigs Belt',
+             'Royal Knight\'s Belt +1', 'Royal Knight\'s Belt +2', 'Desert Stone', 'Corsette',
+             'Corsette +1' },
+        Legs  = { 'Galliard Trousers', 'Clown\'s Subligar', 'Clown\'s Subligar +1',
+             'Coral Subligar', 'Merman\'s Subligar', 'Luna Subligar', 'Darksteel Codpiece',
+             'Ceremonial Hose', 'Platino Hose', 'Custom Pants', 'Custom Slacks',
+             'Elder\'s Braguette' },
+        Feet  = { 'Beast Gaiters +1', 'Heroic Boots', 'Heroic Boots +1', 'Marine F Boots',
+             'Marine M Boots', 'Beast Gaiters', 'Ceremonial Boots', 'Savage Gaiters' },
     },
 	['Reward_Priority'] = {
         Ammo = {'Pet Fd. Epsilon', 'Pet Food Delta', 'Pet Fd. Gamma', 'Pet Food Beta'},
@@ -153,11 +233,18 @@ profile.HandleAbility = function()
 		gFunc.EquipSet(sets.Reward);
 	end
     if (action.Name == 'Call Beast') then
+        local jug = nil;
         if (Settings.UseHQJugs) then
-            gFunc.EquipSet(sets.Jugs_HQ[Settings.Jug]);
-        else
-            gFunc.EquipSet(sets.Jugs[Settings.Jug]);
+            jug = sets.Jugs_HQ[Settings.Jug];
         end
+
+        -- Fall back to the normal broth: calling with an empty ammo slot
+        -- fails outright, which is worse than calling with the lesser jug.
+        if (jug == nil) then
+            jug = sets.Jugs[Settings.Jug];
+        end
+
+        gFunc.EquipSet(jug);
     end
 end
 
@@ -198,18 +285,33 @@ evalLevel = function()
 end
 
 setJug = function(arg1, arg2)
-    if (arg1 == "hq") then
-        Settings.UseHQJugs = true
-        if sets.Jugs_HQ[arg2] ~= nil then
-            -- Pet specified, no hq tag
-            Settings.Jug = arg2;
-        end
-    elseif sets.Jugs[arg1] ~= nil then
-        Settings.UseHQJugs = false
-        -- Pet specified, no hq tag
-        Settings.Jug = arg1;
+    -- /bst jug <pet>      normal broth
+    -- /bst jug hq <pet>   high quality broth
+    -- /bst jug hq         switch the current pet to its high quality broth
+    local wantHQ = (arg1 == 'hq');
+    local pet = arg1;
+    if (wantHQ) then
+        pet = arg2;
     end
-    
+
+    if (pet ~= nil) then
+        if (sets.Jugs[pet] == nil) then
+            gFunc.Message('No jug pet called ' .. tostring(pet));
+            return;
+        end
+
+        Settings.Jug = pet;
+    end
+
+    Settings.UseHQJugs = wantHQ;
+
+    -- Not every pet has a high quality broth. Say so and fall back, rather
+    -- than leaving a setting that equips nothing when Call Beast is used.
+    if (Settings.UseHQJugs) and (sets.Jugs_HQ[Settings.Jug] == nil) then
+        gFunc.Message('No hq broth for ' .. Settings.Jug .. ', using the normal one');
+        Settings.UseHQJugs = false;
+    end
+
     -- Display Default Jug Setting
     if (Settings.UseHQJugs) then
         gFunc.Message("Jug: hq " .. Settings.Jug);
