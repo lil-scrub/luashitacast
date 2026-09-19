@@ -1,6 +1,7 @@
 local profile = {};
 local utility = gFunc.LoadFile('./utility.lua');
 local common = gFunc.LoadFile('./common.lua');
+local staves = gFunc.LoadFile('./staves.lua');
 
 local Settings = {
     MacroBook = '5',
@@ -36,6 +37,10 @@ profile.HandleDefault = function()
 	end
 	if (player.Status == 'Idle') then
 		gFunc.EquipSet(common.Sets.Dream);
+		staves.EquipIdleStaff();
+	end
+	if (player.Status == 'Resting') then
+		staves.EquipRestingStaff();
 	end
 
 	utility.EquipSet();
@@ -58,6 +63,8 @@ profile.HandleMidcast = function()
 	local action = gData.GetAction();
 	
 	utility.CheckCast(action.Name);
+
+	staves.EquipStaff(action);
 end
 
 profile.HandlePreshot = function()
