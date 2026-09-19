@@ -2,8 +2,6 @@ local profile = {};
 
 local Settings = {
 	UseAccuracy = false,
-    UseExperience = false,
-    UseWarp = false,
 };
 
 local sets = {
@@ -30,12 +28,6 @@ local sets = {
 		Hands = 'Dream Mittens +1',
 		Feet = 'Dream Boots +1',
     },
-    ['Flex'] = {
-        Head = '';
-        Body = '';
-        Legs = '';
-        Feet = '';
-    }
 };
 profile.Sets = sets;
 
