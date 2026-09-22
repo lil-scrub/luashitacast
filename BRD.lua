@@ -10,13 +10,17 @@ local Settings = {
 };
 
 sets = {
-    -- Standing and pulling gear. Ordered for mitigation: the percentage of
-    -- damage taken that a piece removes comes first, with defence counted at
-    -- roughly fifteen points to the percent, and maximum HP breaking ties.
-    -- Gear that adds enmity is still excluded outright -- a puller wants no
-    -- extra hate -- but gear that adds HP is welcome now that the song swap
-    -- takes maximum HP down before it puts it up. Terra's Staff is the HQ
-    -- Earth Staff -- both give physical damage taken -20%.
+    -- Standing and pulling gear. Ordered for defence and damage reduction and
+    -- nothing else: a flat percentage off damage taken comes first, then raw
+    -- defence at roughly fifteen points to the percent.
+    -- Maximum HP is no longer a tiebreaker. A bigger pool does not reduce
+    -- what lands, and the song swap raises maximum HP by itself when the
+    -- Minstrel's Ring latent needs it, so HP gear here only competed with
+    -- defence for the same slots. Gear that adds enmity stays excluded
+    -- outright -- a puller wants no extra hate.
+    -- The three pieces carrying the set are Terra's Staff (the HQ Earth
+    -- Staff; both are physical damage taken -20%), Defending Ring (damage
+    -- taken -10%) and Shadow Mantle (occasionally annuls physical damage).
     ['Pulling_NIN_Priority'] = {
         Main  = { 'Terra\'s Staff', 'Earth Staff' },
         Ammo  = { 'Pebble' },
@@ -45,7 +49,7 @@ sets = {
              'Black Neckerchief', 'Feather Collar +1', 'Leather Gorget +1', 'Green Scarf',
              'Orochi Nodowa', 'Dog Collar', 'Feather Collar', 'Justice Badge', 'Leather Gorget',
              'Shield Pendant', 'Windurstian Scarf', 'Bloodbead Amulet', 'Grandiose Chain' },
-        Ear1  = { 'Merman\'s Earring', 'Coral Earring', 'Intruder Earring', 'Bitter Earring',
+        Ear1  = { 'Coral Earring', 'Merman\'s Earring', 'Intruder Earring', 'Bitter Earring',
              'Cassie Earring', 'Hvn. Earring +1', 'Allure Earring +1', 'Lyt. Earring +1',
              'Hope Earring +1', 'Chaotic Earring', 'Haten Earring', 'Priest\'s Earring',
              'Adroit Earring +1', 'Cmn. Earring +1', 'Cel. Earring +1', 'Genius Earring +1',
@@ -55,7 +59,7 @@ sets = {
              'Blc. Earring +1', 'Crg. Earring +1', 'Energy Earring +1', 'Kldg. Earring +1',
              'Optical Earring', 'Reflex Earring +1', 'Morukaka Earring', 'Stoic Earring',
              'Ethereal Earring', 'Insomnia Earring', 'Ryakho\'s Earring', 'Shield Earring' },
-        Ear2  = { 'Merman\'s Earring', 'Coral Earring', 'Intruder Earring', 'Bitter Earring',
+        Ear2  = { 'Coral Earring', 'Merman\'s Earring', 'Intruder Earring', 'Bitter Earring',
              'Cassie Earring', 'Hvn. Earring +1', 'Allure Earring +1', 'Lyt. Earring +1',
              'Hope Earring +1', 'Chaotic Earring', 'Haten Earring', 'Priest\'s Earring',
              'Adroit Earring +1', 'Cmn. Earring +1', 'Cel. Earring +1', 'Genius Earring +1',
@@ -78,9 +82,9 @@ sets = {
              'Mage\'s Tunic', 'Wool Robe', 'Great Doublet', 'Beetle Harness +1', 'Fine Jerkin',
              'Garrison Tunica', 'Lizard Jerkin', 'Bone Harness +1', 'Priest\'s Robe',
              'Bone Harness', 'Healing Harness', 'Kingdom Tunic' },
-        Hands = { 'Merman\'s Bangles', 'Dst. Mittens +1', 'Prt. Bangles', 'Darksteel Mittens',
-             'Seiryu\'s Kote', 'Hct. Mittens +1', 'Dusk Gloves +1', 'Hecatomb Mittens',
-             'Dusk Gloves', 'Zenith Mitts +1', 'Coral Bangles', 'Zenith Mitts',
+        Hands = { 'Dst. Mittens +1', 'Prt. Bangles', 'Darksteel Mittens', 'Seiryu\'s Kote',
+             'Hct. Mittens +1', 'Dusk Gloves +1', 'Hecatomb Mittens', 'Dusk Gloves',
+             'Zenith Mitts +1', 'Coral Bangles', 'Merman\'s Bangles', 'Zenith Mitts',
              'Cpc. Gauntlets +1', 'Magical Mitts', 'Fencing Bracers', 'Cpc. Gauntlets',
              'Pallas\'s Bracelets', 'Light Gauntlets', 'Beak Gloves +1', 'Akinji Bazubands',
              'Enkelados\'s Brc.', 'Scp. Mittens +1', 'Beak Gloves', 'Dino Gloves',
@@ -116,7 +120,7 @@ sets = {
              'Safeguard Ring', 'San d\'Orian Ring', 'Armored Ring', 'Balance Ring +1',
              'Courage Ring +1', 'Energy Ring +1', 'Gold Ring +1', 'Gold Ring',
              'Mythril Ring +1', 'Mythril Ring' },
-        Back  = { 'Umbra Cape', 'Hexerei Cape', 'Cheviot Cape', 'Shadow Mantle',
+        Back  = { 'Shadow Mantle', 'Umbra Cape', 'Hexerei Cape', 'Cheviot Cape',
              'Behem. Mantle +1', 'Behemoth Mantle', 'Marid Mantle +1', 'Empwr. Mantle +1',
              'Marid Mantle', 'Mahatma Cape', 'Black Mantle +1', 'Feral Mantle',
              'Desert Mantle +1', 'Errant Cape', 'Corse Cape', 'Beak Mantle +1',
@@ -171,8 +175,11 @@ sets = {
              'Kingdom Boots', 'Fine Ledelsens', 'Bone Leggings +1', 'San d\'Orian Boots',
              'Republic Leggings', 'Garrison Boots', 'Lizard Ledelsens', 'Bone Leggings' },
     },
-    -- The same, except the chest is Gaudy Harness with a white mage subjob:
-    -- its latent gives refresh while MP is under 49.
+    -- The same, with two changes a white mage subjob allows. The chest is
+    -- Gaudy Harness, whose latent gives refresh while MP is under 49, and the
+    -- neck leads with Stoneskin Torque: Stoneskin absorbs damage outright, so
+    -- enhancing it belongs in a set ordered for damage reduction. Neither is
+    -- worth a slot under a ninja subjob, which cannot cast Stoneskin at all.
     ['Pulling_WHM_Priority'] = {
         Main  = { 'Terra\'s Staff', 'Earth Staff' },
         Ammo  = { 'Pebble' },
@@ -188,10 +195,10 @@ sets = {
              'Wool Hat +1', 'Shade Tiara', 'Great Headgear', 'Beetle Mask +1', 'Wool Hat',
              'Cotton Headgear', 'Lizard Helm +1', 'Bone Mask +1', 'Kingdom Bandana',
              'Republic Cap', 'Bonze\'s Circlet', 'Lizard Helm', 'Bone Mask', 'San. Bandana' },
-        Neck  = { 'Rho Necklace', 'Wivre Gorget +1', 'Tempered Chain', 'Wivre Gorget',
-             'Torama Gorget', 'Coeurl Gorget', 'Torque +1', 'Beak Necklace +1',
-             'Auditory Torque', 'Blue Gorget', 'Brisingamen +1', 'Chivalrous Chain',
-             'Fortified Chain', 'Stoneskin Torque', 'Torque', 'Beak Necklace',
+        Neck  = { 'Stoneskin Torque', 'Rho Necklace', 'Wivre Gorget +1', 'Tempered Chain',
+             'Wivre Gorget', 'Torama Gorget', 'Coeurl Gorget', 'Torque +1',
+             'Beak Necklace +1', 'Auditory Torque', 'Blue Gorget', 'Brisingamen +1',
+             'Chivalrous Chain', 'Fortified Chain', 'Torque', 'Beak Necklace',
              'Intellect Torque', 'Storm Gorget', 'Carapace Gorget', 'Clay Amulet',
              'Stone Gorget', 'Memento Muffler', 'Wolf Gorget +1', 'Checkered Scarf',
              'Promise Badge', 'Qiqirn Collar', 'Brisingamen', 'Agile Gorget', 'Medieval Collar',
@@ -201,7 +208,7 @@ sets = {
              'Black Neckerchief', 'Feather Collar +1', 'Leather Gorget +1', 'Green Scarf',
              'Orochi Nodowa', 'Dog Collar', 'Feather Collar', 'Justice Badge', 'Leather Gorget',
              'Shield Pendant', 'Windurstian Scarf', 'Bloodbead Amulet', 'Grandiose Chain' },
-        Ear1  = { 'Merman\'s Earring', 'Coral Earring', 'Intruder Earring', 'Bitter Earring',
+        Ear1  = { 'Coral Earring', 'Merman\'s Earring', 'Intruder Earring', 'Bitter Earring',
              'Cassie Earring', 'Hvn. Earring +1', 'Allure Earring +1', 'Lyt. Earring +1',
              'Hope Earring +1', 'Chaotic Earring', 'Haten Earring', 'Priest\'s Earring',
              'Adroit Earring +1', 'Cmn. Earring +1', 'Cel. Earring +1', 'Genius Earring +1',
@@ -211,7 +218,7 @@ sets = {
              'Blc. Earring +1', 'Crg. Earring +1', 'Energy Earring +1', 'Kldg. Earring +1',
              'Optical Earring', 'Reflex Earring +1', 'Morukaka Earring', 'Stoic Earring',
              'Ethereal Earring', 'Insomnia Earring', 'Ryakho\'s Earring', 'Shield Earring' },
-        Ear2  = { 'Merman\'s Earring', 'Coral Earring', 'Intruder Earring', 'Bitter Earring',
+        Ear2  = { 'Coral Earring', 'Merman\'s Earring', 'Intruder Earring', 'Bitter Earring',
              'Cassie Earring', 'Hvn. Earring +1', 'Allure Earring +1', 'Lyt. Earring +1',
              'Hope Earring +1', 'Chaotic Earring', 'Haten Earring', 'Priest\'s Earring',
              'Adroit Earring +1', 'Cmn. Earring +1', 'Cel. Earring +1', 'Genius Earring +1',
@@ -235,9 +242,9 @@ sets = {
              'Great Doublet', 'Beetle Harness +1', 'Fine Jerkin', 'Garrison Tunica',
              'Lizard Jerkin', 'Bone Harness +1', 'Priest\'s Robe', 'Bone Harness',
              'Healing Harness', 'Kingdom Tunic' },
-        Hands = { 'Merman\'s Bangles', 'Dst. Mittens +1', 'Prt. Bangles', 'Darksteel Mittens',
-             'Seiryu\'s Kote', 'Hct. Mittens +1', 'Dusk Gloves +1', 'Hecatomb Mittens',
-             'Dusk Gloves', 'Zenith Mitts +1', 'Coral Bangles', 'Zenith Mitts',
+        Hands = { 'Dst. Mittens +1', 'Prt. Bangles', 'Darksteel Mittens', 'Seiryu\'s Kote',
+             'Hct. Mittens +1', 'Dusk Gloves +1', 'Hecatomb Mittens', 'Dusk Gloves',
+             'Zenith Mitts +1', 'Coral Bangles', 'Merman\'s Bangles', 'Zenith Mitts',
              'Cpc. Gauntlets +1', 'Magical Mitts', 'Fencing Bracers', 'Cpc. Gauntlets',
              'Pallas\'s Bracelets', 'Light Gauntlets', 'Beak Gloves +1', 'Akinji Bazubands',
              'Enkelados\'s Brc.', 'Scp. Mittens +1', 'Beak Gloves', 'Dino Gloves',
@@ -273,7 +280,7 @@ sets = {
              'Safeguard Ring', 'San d\'Orian Ring', 'Armored Ring', 'Balance Ring +1',
              'Courage Ring +1', 'Energy Ring +1', 'Gold Ring +1', 'Gold Ring',
              'Mythril Ring +1', 'Mythril Ring' },
-        Back  = { 'Umbra Cape', 'Hexerei Cape', 'Cheviot Cape', 'Shadow Mantle',
+        Back  = { 'Shadow Mantle', 'Umbra Cape', 'Hexerei Cape', 'Cheviot Cape',
              'Behem. Mantle +1', 'Behemoth Mantle', 'Marid Mantle +1', 'Empwr. Mantle +1',
              'Marid Mantle', 'Mahatma Cape', 'Black Mantle +1', 'Feral Mantle',
              'Desert Mantle +1', 'Errant Cape', 'Corse Cape', 'Beak Mantle +1',
