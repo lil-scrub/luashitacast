@@ -7,6 +7,7 @@ local Settings = {
     MacroBook = '1',
     CurrentLevel = 0,
     UseMelee = false,
+    UseEnmity = false,
 };
 
 -- Filling these in: gFunc.EvaluateLevels picks the first entry in a
@@ -264,6 +265,47 @@ sets = {
              'Republic Greaves', 'Cuir Highboots', 'Ebony Sabots +1', 'Kingdom Boots',
              'Fine Ledelsens', 'Bone Leggings +1', 'San d\'Orian Boots', 'Garrison Boots' },
     },
+    -- Hate shedding, toggled with /rdm enmity. Laid over the idle set rather
+    -- than replacing it, so a slot you own no Enmity- piece for keeps its MP
+    -- gear instead of going bare. Every entry below carries Enmity- on
+    -- Horizon and is ordered by how much of it, best first. Ears are
+    -- deliberately absent: the only era earrings with Enmity- are latent or
+    -- Assault-only, and an idle Loquacious beats a latent that never fires.
+    ['Enmity_Priority'] = {
+        -- Hydra -8, Raven -8, Crow -7, Mahatma -6, then the -5s.
+        Head  = { 'Hydra Beret', 'Raven Beret', 'Crow Beret', 'Mahatma Hat',
+             'Nashira Turban', 'Yigit Turban', 'Errant Hat', 'Goliard Chapeau',
+             'Valkyrie\'s Hat', 'Shadow Hat' },
+        -- Fenrir's Torque is -3 at night and MP+30 by day, so it is never a
+        -- dead slot. Thin pickings otherwise.
+        Neck  = { 'Fenrir\'s Torque', 'Benign Necklace', 'Lieut. Gorget' },
+        -- Hydra -9 with an enchanted Refresh, Raven -9, Crow -8. The RDM-only
+        -- Chasubles are craftable and worth having if nothing above is.
+        Body  = { 'Hydra Doublet', 'Raven Jupon', 'Crow Jupon', 'Goliard Saio',
+             'Valkyrie\'s Coat', 'Mahatma Hpl.', 'Shadow Coat', 'Errant Hpl.',
+             'Chasuble +1', 'Chasuble' },
+        Hands = { 'Hydra Gloves', 'Raven Bracers', 'Nashira Gages', 'Crow Bracers',
+             'Mahatma Cuffs', 'Wise Gloves +1', 'Valkyrie\'s Cuffs', 'Errant Cuffs',
+             'Wise Gloves', 'Shadow Cuffs' },
+        -- Tamas Ring is Enmity-5 on Horizon, not the -3 the retail wikis list,
+        -- which makes a CoP mission reward the best ring in the set.
+        Ring1 = { 'Tamas Ring', 'Trooper\'s Ring', 'Serene Ring', 'Peace Ring' },
+        Ring2 = { 'Tamas Ring', 'Trooper\'s Ring', 'Serene Ring', 'Peace Ring' },
+        -- Talisman Cape is -2 only while the enchantment is running, so it
+        -- sits below everything that carries the stat outright.
+        Back  = { 'Mahatma Cape', 'Errant Cape', 'Peace Cape +1', 'Peace Cape',
+             'Amity Cape', 'Sapient Cape', 'Miraculous Cape', 'Esoteric Mantle',
+             'Talisman Cape' },
+        -- Same caveat on the Talisman Obi: enchantment only.
+        Waist = { 'Theta Sash', 'Spectral Belt', 'Penitent\'s Rope',
+             'Immortal\'s Sash', 'Talisman Obi' },
+        Legs  = { 'Hydra Brais', 'Raven Hose', 'Wise Braconi +1', 'Crow Hose',
+             'Goliard Trews', 'Mahatma Slops', 'Wise Braconi', 'Errant Slops',
+             'Morrigan\'s Slops' },
+        Feet  = { 'Hydra Gaiters', 'Arborist Nails', 'Raven Gaiters', 'Crow Gaiters',
+             'Mahatma Pigaches', 'Avocat Pigaches', 'Errant Pigaches',
+             'Wise Pigaches +1', 'Wise Pigaches', 'Macha\'s Pigaches' },
+    },
     -- Fast cast, worn during the precast phase of every spell.
     ['Precast_Priority'] = {
         Head  = { 'Wlk. Chapeau +1', 'Warlock\'s Chapeau' },
@@ -507,6 +549,13 @@ profile.HandleCommand = function(args)
         Settings.UseMelee = not Settings.UseMelee;
         gFunc.Message('Melee mode: ' .. tostring(Settings.UseMelee));
     end
+
+    -- Trade the idle MP gear for everything that carries Enmity-, for when
+    -- the tank's hate is thin and a cure or an enfeeble would peel the mob.
+    if (args[1] == 'enmity') then
+        Settings.UseEnmity = not Settings.UseEnmity;
+        gFunc.Message('Enmity- idle: ' .. tostring(Settings.UseEnmity));
+    end
 end
 
 profile.HandleDefault = function()
@@ -522,6 +571,11 @@ profile.HandleDefault = function()
 		gFunc.EquipSet(sets.Weapon);
 	else
 		gFunc.EquipSet(sets.Idle);
+		-- Over the idle set, not instead of it: a slot with no Enmity- piece
+		-- in the bags keeps the MP gear underneath.
+		if (Settings.UseEnmity) then
+			gFunc.EquipSet(sets.Enmity);
+		end
 		staves.EquipIdleStaff();
 	end
 
