@@ -7,49 +7,107 @@ local Settings = {
 	CurrentLevel = 0,
 	HPSwapped = false,
 	MacroBook = '2',
+	IdleMode = 1,
+};
+
+-- Idle modes. Each entry is a full set the bard stands in, switched to with
+-- /brd <Cmd>. Exactly one is active at a time and they are never worn
+-- together, so each resolves against the bags independently and two modes
+-- naming the same piece cannot fight over it.
+--
+-- Set   the set worn while the mode is active, covering every slot.
+-- WHM   optional, a small set layered over Set under a white mage subjob.
+--       Omit it when the subjob changes nothing for the mode.
+-- Label what the mode is called when the profile reports it.
+--
+-- Adding a mode is one row here plus its gear set. Array order is listing
+-- order; entry one is active when the profile loads.
+local IdleModes = {
+	{ Cmd = 'mit', Set = 'Idle_Mit', WHM = 'Idle_Mit_WHM',
+	  Label = 'damage mitigation' },
+	{ Cmd = 'enmity', Set = 'Idle_Enmity',
+	  Label = 'Enmity-' },
+};
+
+-- The shared utility toggles, in the order utility.SetOptions tests them. They
+-- are consumed before the profile ever sees the word, so they cannot live in
+-- the mode registry, and the help listing takes their descriptions from here.
+-- Keep this in step with utility.lua: a toggle added there stays invisible to
+-- the listing until it is added here too.
+local UtilityCommands = {
+	{ Cmd = 'exp',   Label = 'experience ring' },
+	{ Cmd = 'warp',  Label = 'warp cudgel' },
+	{ Cmd = 'sneak', Label = 'sneak feet' },
+	{ Cmd = 'invis', Label = 'invisible hands' },
+	{ Cmd = 'clam',  Label = 'clamming set' },
+	{ Cmd = 'fish',  Label = 'fishing set and macro book' },
+};
+
+-- Command words that never reach a mode. The utility options are consumed by
+-- utility.SetOptions and the accuracy option by common.SetMeleeOptions, both
+-- of which run before the mode lookup; gear and modes are the profile's own.
+-- A mode registered under one of these would be shadowed and never fire, so
+-- the collision is reported at load rather than left to be discovered in game.
+local ReservedCommands = {
+	'gear', 'modes', 'help', 'acc', 'exp', 'warp', 'sneak', 'invis', 'clam',
+	'fish',
 };
 
 sets = {
-    -- Standing and pulling gear. Ordered for defence and damage reduction and
-    -- nothing else: a flat percentage off damage taken comes first, then raw
-    -- defence at roughly fifteen points to the percent.
-    -- Maximum HP is no longer a tiebreaker. A bigger pool does not reduce
-    -- what lands, and the song swap raises maximum HP by itself when the
-    -- Minstrel's Ring latent needs it, so HP gear here only competed with
-    -- defence for the same slots. Gear that adds enmity stays excluded
-    -- outright -- a puller wants no extra hate.
-    -- The three pieces carrying the set are Terra's Staff (the HQ Earth
-    -- Staff; both are physical damage taken -20%), Defending Ring (damage
-    -- taken -10%) and Shadow Mantle (occasionally annuls physical damage).
-    ['Pulling_NIN_Priority'] = {
+    -- The damage mitigation idle mode. Worn whenever the bard is not casting
+    -- -- standing, resting, pulling and meleeing alike -- so it is the standing
+    -- set, not pulling gear specifically.
+    --
+    -- Ordered magic first. A bard holds little hate, so what actually lands is
+    -- mostly spells and area effects rather than melee swings, and raw defence
+    -- does nothing about those. Per slot: the most magic damage removed leads,
+    -- then gear that removes damage from both schools, then Magic Def. Bonus,
+    -- then physical damage taken, then defence. Gear that adds enmity stays
+    -- excluded outright -- a bard wants no extra hate.
+    --
+    -- Damage taken -% counts as magic mitigation because it is: Defending Ring
+    -- takes 10% off both schools, which beats Minerva's Ring at magic -8% while
+    -- also not handing back 8% physical, so it keeps the ring slot.
+    --
+    -- Conditional stats are ignored, the rule from ecad9f2. Horror Head reads
+    -- Enmity -50 but only on a full moon, on Darksday, at night, and Resentment
+    -- Cape's magic -5% only applies outside its nation's control. Scored naively
+    -- both would lead their slots.
+    --
+    -- Main is the one slot with no magic answer at all: no staff on the server
+    -- carries magic damage taken, so Terra's Staff keeps it on physical -20%,
+    -- which is still free value against the lesser threat.
+    ['Idle_Mit_Priority'] = {
         Main  = { 'Terra\'s Staff', 'Earth Staff' },
         Ammo  = { 'Pebble' },
-        Head  = { 'Darksteel Cap +1', 'Darksteel Cap', 'Genbu\'s Kabuto', 'Hecatomb Cap +1',
-             'Hecatomb Cap', 'Dusk Mask +1', 'Io\'s helm', 'Dusk Mask', 'Zenith Crown +1',
-             'Zenith Crown', 'Carapace Helm +1', 'Scorpion Helm +1', 'Dartorgor\'s Coif',
-             'Troll Coif', 'Carapace Helm', 'Magus Keffiyeh', 'Beak Helm +1', 'Akinji Khud',
-             'Scorpion Mask +1', 'Beak Helm', 'Jaridah Khud', 'Scorpion Mask', 'T.M. Hat +2',
-             'Dino Helm', 'Magi Hat', 'Raptor Helm', 'Wool Cap +1', 'Carapace Mask +1',
-             'Wool Cap', 'Carapace Mask', 'Namru\'s Tiara', 'Corsair\'s Hat +1',
-             'Cuir Bandana +1', 'Cuir Bandana', 'Mage\'s Hat', 'Red Cap +1', 'Strong Cap',
-             'Sinister Mask', 'Velvet Hat', 'Red Cap', 'Shade Tiara +1', 'Trump Crown',
-             'Wool Hat +1', 'Shade Tiara', 'Great Headgear', 'Beetle Mask +1', 'Wool Hat',
-             'Cotton Headgear', 'Lizard Helm +1', 'Bone Mask +1', 'Kingdom Bandana',
-             'Republic Cap', 'Bonze\'s Circlet', 'Lizard Helm', 'Bone Mask', 'San. Bandana' },
+        Head  = { 'Storm Turban', 'Darksteel Cap +1', 'Darksteel Cap', 'Genbu\'s Kabuto',
+             'Hecatomb Cap +1', 'Hecatomb Cap', 'Dusk Mask +1', 'Io\'s helm', 'Dusk Mask',
+             'Zenith Crown +1', 'Zenith Crown', 'Carapace Helm +1', 'Scorpion Helm +1',
+             'Dartorgor\'s Coif', 'Troll Coif', 'Carapace Helm', 'Magus Keffiyeh',
+             'Beak Helm +1', 'Akinji Khud', 'Scorpion Mask +1', 'Beak Helm', 'Jaridah Khud',
+             'Scorpion Mask', 'T.M. Hat +2', 'Dino Helm', 'Magi Hat', 'Raptor Helm',
+             'Wool Cap +1', 'Carapace Mask +1', 'Wool Cap', 'Carapace Mask', 'Namru\'s Tiara',
+             'Corsair\'s Hat +1', 'Cuir Bandana +1', 'Cuir Bandana', 'Mage\'s Hat',
+             'Red Cap +1', 'Strong Cap', 'Sinister Mask', 'Velvet Hat', 'Red Cap',
+             'Shade Tiara +1', 'Trump Crown', 'Wool Hat +1', 'Shade Tiara', 'Great Headgear',
+             'Beetle Mask +1', 'Wool Hat', 'Cotton Headgear', 'Lizard Helm +1',
+             'Bone Mask +1', 'Kingdom Bandana', 'Republic Cap', 'Bonze\'s Circlet',
+             'Lizard Helm', 'Bone Mask', 'San. Bandana' },
         Neck  = { 'Rho Necklace', 'Wivre Gorget +1', 'Tempered Chain', 'Wivre Gorget',
              'Torama Gorget', 'Coeurl Gorget', 'Torque +1', 'Beak Necklace +1',
              'Auditory Torque', 'Blue Gorget', 'Brisingamen +1', 'Chivalrous Chain',
              'Fortified Chain', 'Stoneskin Torque', 'Torque', 'Beak Necklace',
              'Intellect Torque', 'Storm Gorget', 'Carapace Gorget', 'Clay Amulet',
              'Stone Gorget', 'Memento Muffler', 'Wolf Gorget +1', 'Checkered Scarf',
-             'Promise Badge', 'Qiqirn Collar', 'Brisingamen', 'Agile Gorget', 'Medieval Collar',
-             'Wolf Gorget', 'Holy Phial', 'Hemp Gorget +1', 'Green Gorget', 'Van Pendant',
-             'Paisley Scarf', 'Orochi Nodowa +1', 'M. No.17\'s Locket', 'Jagd Gorget',
-             'Mohbwa Scarf +1', 'Tiger Stole', 'Hemp Gorget', 'Beetle Gorget',
+             'Promise Badge', 'Qiqirn Collar', 'Brisingamen', 'Agile Gorget',
+             'Medieval Collar', 'Wolf Gorget', 'Holy Phial', 'Hemp Gorget +1', 'Green Gorget',
+             'Van Pendant', 'Paisley Scarf', 'Orochi Nodowa +1', 'M. No.17\'s Locket',
+             'Jagd Gorget', 'Mohbwa Scarf +1', 'Tiger Stole', 'Hemp Gorget', 'Beetle Gorget',
              'Black Neckerchief', 'Feather Collar +1', 'Leather Gorget +1', 'Green Scarf',
-             'Orochi Nodowa', 'Dog Collar', 'Feather Collar', 'Justice Badge', 'Leather Gorget',
-             'Shield Pendant', 'Windurstian Scarf', 'Bloodbead Amulet', 'Grandiose Chain' },
-        Ear1  = { 'Coral Earring', 'Merman\'s Earring', 'Intruder Earring', 'Bitter Earring',
+             'Orochi Nodowa', 'Dog Collar', 'Feather Collar', 'Justice Badge',
+             'Leather Gorget', 'Shield Pendant', 'Windurstian Scarf', 'Bloodbead Amulet',
+             'Grandiose Chain' },
+        Ear1  = { 'Merman\'s Earring', 'Coral Earring', 'Intruder Earring', 'Bitter Earring',
              'Cassie Earring', 'Hvn. Earring +1', 'Allure Earring +1', 'Lyt. Earring +1',
              'Hope Earring +1', 'Chaotic Earring', 'Haten Earring', 'Priest\'s Earring',
              'Adroit Earring +1', 'Cmn. Earring +1', 'Cel. Earring +1', 'Genius Earring +1',
@@ -59,7 +117,7 @@ sets = {
              'Blc. Earring +1', 'Crg. Earring +1', 'Energy Earring +1', 'Kldg. Earring +1',
              'Optical Earring', 'Reflex Earring +1', 'Morukaka Earring', 'Stoic Earring',
              'Ethereal Earring', 'Insomnia Earring', 'Ryakho\'s Earring', 'Shield Earring' },
-        Ear2  = { 'Coral Earring', 'Merman\'s Earring', 'Intruder Earring', 'Bitter Earring',
+        Ear2  = { 'Merman\'s Earring', 'Coral Earring', 'Intruder Earring', 'Bitter Earring',
              'Cassie Earring', 'Hvn. Earring +1', 'Allure Earring +1', 'Lyt. Earring +1',
              'Hope Earring +1', 'Chaotic Earring', 'Haten Earring', 'Priest\'s Earring',
              'Adroit Earring +1', 'Cmn. Earring +1', 'Cel. Earring +1', 'Genius Earring +1',
@@ -69,22 +127,23 @@ sets = {
              'Blc. Earring +1', 'Crg. Earring +1', 'Energy Earring +1', 'Kldg. Earring +1',
              'Optical Earring', 'Reflex Earring +1', 'Morukaka Earring', 'Stoic Earring',
              'Ethereal Earring', 'Insomnia Earring', 'Ryakho\'s Earring', 'Shield Earring' },
-        Body  = { 'Dst. Harness +1', 'Darksteel Harness', 'Kirin\'s Osode', 'Hct. Harness +1',
-             'Dusk Jerkin', 'Hecatomb Harness', 'Vishnu\'s Vest', 'Narasimha\'s Vest',
-             'Scp. Brstplate +1', 'Dalmatica +1', 'Chl. Jstcorps +1', 'Silk Cloak +1',
-             'Scp. Breastplate', 'Cpc. Brstplate +1', 'Cpc. Breastplate', 'Tundra Jerkin',
-             'Beak Jerkin +1', 'Shaman\'s Cloak', 'Akinji Peti', 'Corsair\'s Frac',
-             'Beak Jerkin', 'R.K. Cloak +2', 'Jaridah Peti', 'Scp. Harness +1', 'Dino Jerkin',
-             'Raptor Jerkin', 'C.C. Cloak +2', 'Brigandine +1', 'C.C. Cloak +1', 'Brigandine',
-             'Wool Gambison +1', 'Cpc. Harness +1', 'Cuir Bouilli +1', 'Cuir Bouilli',
-             'Cloak +1', 'Cloak', 'Mana Cloak', 'Mage\'s Robe', 'Strong Harness', 'Velvet Robe',
-             'Faerie Tunic', 'Shade Harness +1', 'Wool Robe +1', 'Shade Harness',
-             'Mage\'s Tunic', 'Wool Robe', 'Great Doublet', 'Beetle Harness +1', 'Fine Jerkin',
+        Body  = { 'Valkyrie\'s Coat', 'Shadow Coat', 'Dst. Harness +1', 'Darksteel Harness',
+             'Kirin\'s Osode', 'Hct. Harness +1', 'Dusk Jerkin', 'Hecatomb Harness',
+             'Vishnu\'s Vest', 'Narasimha\'s Vest', 'Scp. Brstplate +1', 'Dalmatica +1',
+             'Chl. Jstcorps +1', 'Silk Cloak +1', 'Scp. Breastplate', 'Cpc. Brstplate +1',
+             'Cpc. Breastplate', 'Tundra Jerkin', 'Beak Jerkin +1', 'Shaman\'s Cloak',
+             'Akinji Peti', 'Corsair\'s Frac', 'Beak Jerkin', 'R.K. Cloak +2', 'Jaridah Peti',
+             'Scp. Harness +1', 'Dino Jerkin', 'Raptor Jerkin', 'C.C. Cloak +2',
+             'Brigandine +1', 'C.C. Cloak +1', 'Brigandine', 'Wool Gambison +1',
+             'Cpc. Harness +1', 'Cuir Bouilli +1', 'Cuir Bouilli', 'Cloak +1', 'Cloak',
+             'Mana Cloak', 'Mage\'s Robe', 'Strong Harness', 'Velvet Robe', 'Faerie Tunic',
+             'Shade Harness +1', 'Wool Robe +1', 'Shade Harness', 'Mage\'s Tunic',
+             'Wool Robe', 'Great Doublet', 'Beetle Harness +1', 'Fine Jerkin',
              'Garrison Tunica', 'Lizard Jerkin', 'Bone Harness +1', 'Priest\'s Robe',
              'Bone Harness', 'Healing Harness', 'Kingdom Tunic' },
-        Hands = { 'Dst. Mittens +1', 'Prt. Bangles', 'Darksteel Mittens', 'Seiryu\'s Kote',
-             'Hct. Mittens +1', 'Dusk Gloves +1', 'Hecatomb Mittens', 'Dusk Gloves',
-             'Zenith Mitts +1', 'Coral Bangles', 'Merman\'s Bangles', 'Zenith Mitts',
+        Hands = { 'Merman\'s Bangles', 'Coral Bangles', 'Dst. Mittens +1', 'Darksteel Mittens',
+             'Prt. Bangles', 'Seiryu\'s Kote', 'Hct. Mittens +1', 'Dusk Gloves +1',
+             'Hecatomb Mittens', 'Dusk Gloves', 'Zenith Mitts +1', 'Zenith Mitts',
              'Cpc. Gauntlets +1', 'Magical Mitts', 'Fencing Bracers', 'Cpc. Gauntlets',
              'Pallas\'s Bracelets', 'Light Gauntlets', 'Beak Gloves +1', 'Akinji Bazubands',
              'Enkelados\'s Brc.', 'Scp. Mittens +1', 'Beak Gloves', 'Dino Gloves',
@@ -96,31 +155,31 @@ sets = {
              'Custom M Gloves', 'Wonder Mitts', 'Fine Gloves', 'Kingdom Gloves',
              'Republic Mittens', 'Lizard Gloves', 'Bone Mittens +1', 'San. Gloves',
              'Bastokan Mittens', 'Bone Mittens' },
-        Ring1 = { 'Defending Ring', 'Jelly Ring', 'Gobniu\'s Ring', 'Phalanx Ring',
-             'Unyielding Ring', 'Dragon Ring +1', 'Unfettered Ring', 'Aegis Ring',
-             'Dragon Ring', 'Cerberus Ring +1', 'Adroit Ring +1', 'Cmn. Ring +1',
-             'Hades Ring +1', 'Heavens Ring +1', 'Gld.Msk. Ring', 'Demon\'s Ring +1',
-             'Tiger Ring', 'Allure Ring +1', 'Celerity Ring +1', 'Genius Ring +1',
-             'Grace Ring +1', 'Kshama Ring No.4', 'Bloodbead Ring', 'Bomb Ring',
-             'Demon\'s Ring', 'Marid Ring +1', 'Earth Ring', 'Marksman\'s Ring',
-             'Alacrity Ring +1', 'Aura Ring +1', 'Deft Ring +1', 'Loyalty Ring +1',
-             'Puissance Ring +1', 'Solace Ring +1', 'Verve Ring +1', 'Leather Ring +1',
-             'Safeguard Ring', 'San d\'Orian Ring', 'Armored Ring', 'Balance Ring +1',
-             'Courage Ring +1', 'Energy Ring +1', 'Gold Ring +1', 'Gold Ring',
-             'Mythril Ring +1', 'Mythril Ring' },
-        Ring2 = { 'Defending Ring', 'Jelly Ring', 'Gobniu\'s Ring', 'Phalanx Ring',
-             'Unyielding Ring', 'Dragon Ring +1', 'Unfettered Ring', 'Aegis Ring',
-             'Dragon Ring', 'Cerberus Ring +1', 'Adroit Ring +1', 'Cmn. Ring +1',
-             'Hades Ring +1', 'Heavens Ring +1', 'Gld.Msk. Ring', 'Demon\'s Ring +1',
-             'Tiger Ring', 'Allure Ring +1', 'Celerity Ring +1', 'Genius Ring +1',
-             'Grace Ring +1', 'Kshama Ring No.4', 'Bloodbead Ring', 'Bomb Ring',
-             'Demon\'s Ring', 'Marid Ring +1', 'Earth Ring', 'Marksman\'s Ring',
-             'Alacrity Ring +1', 'Aura Ring +1', 'Deft Ring +1', 'Loyalty Ring +1',
-             'Puissance Ring +1', 'Solace Ring +1', 'Verve Ring +1', 'Leather Ring +1',
-             'Safeguard Ring', 'San d\'Orian Ring', 'Armored Ring', 'Balance Ring +1',
-             'Courage Ring +1', 'Energy Ring +1', 'Gold Ring +1', 'Gold Ring',
-             'Mythril Ring +1', 'Mythril Ring' },
-        Back  = { 'Shadow Mantle', 'Umbra Cape', 'Hexerei Cape', 'Cheviot Cape',
+        Ring1 = { 'Defending Ring', 'Minerva\'s Ring', 'Shadow Ring', 'Unfettered Ring',
+             'Gobniu\'s Ring', 'Jelly Ring', 'Mercenary\'s Ring', 'Phalanx Ring',
+             'Unyielding Ring', 'Dragon Ring +1', 'Aegis Ring', 'Dragon Ring',
+             'Cerberus Ring +1', 'Adroit Ring +1', 'Cmn. Ring +1', 'Hades Ring +1',
+             'Heavens Ring +1', 'Gld.Msk. Ring', 'Demon\'s Ring +1', 'Tiger Ring',
+             'Allure Ring +1', 'Celerity Ring +1', 'Genius Ring +1', 'Grace Ring +1',
+             'Kshama Ring No.4', 'Bloodbead Ring', 'Bomb Ring', 'Demon\'s Ring',
+             'Marid Ring +1', 'Earth Ring', 'Marksman\'s Ring', 'Alacrity Ring +1',
+             'Aura Ring +1', 'Deft Ring +1', 'Loyalty Ring +1', 'Puissance Ring +1',
+             'Solace Ring +1', 'Verve Ring +1', 'Leather Ring +1', 'Safeguard Ring',
+             'San d\'Orian Ring', 'Armored Ring', 'Balance Ring +1', 'Courage Ring +1',
+             'Energy Ring +1', 'Gold Ring +1', 'Gold Ring', 'Mythril Ring +1', 'Mythril Ring' },
+        Ring2 = { 'Defending Ring', 'Minerva\'s Ring', 'Shadow Ring', 'Unfettered Ring',
+             'Gobniu\'s Ring', 'Jelly Ring', 'Mercenary\'s Ring', 'Phalanx Ring',
+             'Unyielding Ring', 'Dragon Ring +1', 'Aegis Ring', 'Dragon Ring',
+             'Cerberus Ring +1', 'Adroit Ring +1', 'Cmn. Ring +1', 'Hades Ring +1',
+             'Heavens Ring +1', 'Gld.Msk. Ring', 'Demon\'s Ring +1', 'Tiger Ring',
+             'Allure Ring +1', 'Celerity Ring +1', 'Genius Ring +1', 'Grace Ring +1',
+             'Kshama Ring No.4', 'Bloodbead Ring', 'Bomb Ring', 'Demon\'s Ring',
+             'Marid Ring +1', 'Earth Ring', 'Marksman\'s Ring', 'Alacrity Ring +1',
+             'Aura Ring +1', 'Deft Ring +1', 'Loyalty Ring +1', 'Puissance Ring +1',
+             'Solace Ring +1', 'Verve Ring +1', 'Leather Ring +1', 'Safeguard Ring',
+             'San d\'Orian Ring', 'Armored Ring', 'Balance Ring +1', 'Courage Ring +1',
+             'Energy Ring +1', 'Gold Ring +1', 'Gold Ring', 'Mythril Ring +1', 'Mythril Ring' },
+        Back  = { 'Hexerei Cape', 'Umbra Cape', 'Cheviot Cape', 'Shadow Mantle',
              'Behem. Mantle +1', 'Behemoth Mantle', 'Marid Mantle +1', 'Empwr. Mantle +1',
              'Marid Mantle', 'Mahatma Cape', 'Black Mantle +1', 'Feral Mantle',
              'Desert Mantle +1', 'Errant Cape', 'Corse Cape', 'Beak Mantle +1',
@@ -134,18 +193,19 @@ sets = {
              'Night Cape', 'Variable Mantle', 'Cotton Cape +1', 'Dhalmel Mantle',
              'Lizard Mantle +1', 'Mist Silk Cape', 'Talisman Cape', 'Nomad\'s Mantle',
              'Variable Cape', 'Cotton Cape', 'Lizard Mantle' },
-        Waist = { 'Lieutenant\'s Sash', 'Forest Rope', 'Kaiser Belt', 'Marid Belt +1',
-             'Star Sash', 'Desert Sash', 'Forest Sash', 'Marid Belt', 'Czar\'s Belt',
-             'Koenigs Belt', 'Maharaja\'s Belt', 'Pendragon\'s Belt', 'Sultan\'s Belt',
-             'Anrin Obi', 'Dorin Obi', 'R.K. Belt +2', 'Earth Belt', 'R.K. Belt +1',
-             'Desert Belt', 'Forest Belt', 'Twinthread Obi +1', 'Ryl.Kgt. Belt',
-             'Brocade Obi +1', 'Swordbelt +1', 'Corsette +1', 'Qiqirn Sash +1', 'Jungle Belt',
-             'Ocean Belt', 'Brocade Obi', 'Swordbelt', 'Corsette', 'Qiqirn Sash', 'Gold Obi +1',
-             'Silver Belt +1', 'Survival Belt', 'Force Belt', 'Oracle\'s Belt',
-             'Deduct. Gold Obi', 'Enthrall. Gold Obi', 'Gold Obi', 'Sagac. Gold Obi',
-             'Mohbwa Sash +1', 'Silver Obi +1', 'Magic Belt +1', 'Lizard Belt +1',
-             'Warrior\'s Belt +1', 'Shaman\'s Belt', 'Mohbwa Sash', 'Silver Obi', 'Magic Belt',
-             'Lizard Belt', 'Friar\'s Rope', 'Heko Obi +1', 'Augmenting Belt' },
+        Waist = { 'Lieutenant\'s Sash', 'Resolute Belt', 'Forest Rope', 'Kaiser Belt',
+             'Marid Belt +1', 'Star Sash', 'Desert Sash', 'Forest Sash', 'Marid Belt',
+             'Czar\'s Belt', 'Koenigs Belt', 'Maharaja\'s Belt', 'Pendragon\'s Belt',
+             'Sultan\'s Belt', 'Anrin Obi', 'Dorin Obi', 'R.K. Belt +2', 'Earth Belt',
+             'R.K. Belt +1', 'Desert Belt', 'Forest Belt', 'Twinthread Obi +1',
+             'Ryl.Kgt. Belt', 'Brocade Obi +1', 'Swordbelt +1', 'Corsette +1',
+             'Qiqirn Sash +1', 'Jungle Belt', 'Ocean Belt', 'Brocade Obi', 'Swordbelt',
+             'Corsette', 'Qiqirn Sash', 'Gold Obi +1', 'Silver Belt +1', 'Survival Belt',
+             'Force Belt', 'Oracle\'s Belt', 'Deduct. Gold Obi', 'Enthrall. Gold Obi',
+             'Gold Obi', 'Sagac. Gold Obi', 'Mohbwa Sash +1', 'Silver Obi +1',
+             'Magic Belt +1', 'Lizard Belt +1', 'Warrior\'s Belt +1', 'Shaman\'s Belt',
+             'Mohbwa Sash', 'Silver Obi', 'Magic Belt', 'Lizard Belt', 'Friar\'s Rope',
+             'Heko Obi +1', 'Augmenting Belt' },
         Legs  = { 'Goliard Trews', 'Dst. Subligar +1', 'Darksteel Subligar', 'Bahamut\'s Hose',
              'Dusk Trousers +1', 'Dusk Trousers', 'Hct. Subligar +1', 'Hecatomb Subligar',
              'Byakko\'s Haidate', 'Zenith Slacks +1', 'Beak Trousers +1', 'Akinji Salvars',
@@ -160,56 +220,83 @@ sets = {
              'Republic Subligar', 'San. Trousers', 'Great Brais', 'Fine Trousers',
              'Bone Subligar +1', 'Lizard Trousers', 'Bone Subligar', 'Angler\'s Hose',
              'Nomad\'s Hose', 'Rider\'s Hose', 'Worker Hose' },
-        Feet  = { 'Dst. Leggings +1', 'Suzaku\'s Sune-Ate', 'Dst. Leggings',
-             'Dusk Ledelsens +1', 'Dusk Ledelsens', 'Hct. Leggings +1', 'Hct. Leggings',
-             'Zenith Pumps +1', 'Marduk\'s Crackows', 'Rostrum Pumps', 'Root Sabots',
-             'Rutter Sabatons', 'Marid Leggings +1', 'Ataractic Solea', 'Marid Leggings',
-             'Bk. Ledelsens +1', 'Akinji Nails', 'Desert Boots +1', 'Scp. Leggings +1',
-             'Battle Boots +1', 'Tabin Boots +1', 'Beak Ledelsens', 'Jaridah Nails',
-             'Scorpion Leggings', 'Dino Ledelsens', 'Raptor Ledelsens', 'Wool Socks +1',
-             'Cpc. Leggings +1', 'Wool Socks', 'Cpc. Leggings', 'C.C. Shoes +2',
-             'Cuir Highboots +1', 'Powder Boots', 'C.C. Shoes +1', 'Cuir Highboots',
-             'Ebony Sabots +1', 'Socks +1', 'Leggings +1', 'Rubious Pumps', 'Kingdom Clogs',
-             'Ebony Sabots', 'Shade Leggings +1', 'San d\'Orian Clogs', 'Air Solea +1',
-             'Chs. Sabots +1', 'Shade Leggings', 'Winged Boots +1', 'Great Gaiters',
-             'Kingdom Boots', 'Fine Ledelsens', 'Bone Leggings +1', 'San d\'Orian Boots',
-             'Republic Leggings', 'Garrison Boots', 'Lizard Ledelsens', 'Bone Leggings' },
+        Feet  = { 'Dst. Leggings +1', 'Dst. Leggings', 'Suzaku\'s Sune-Ate', 'Dusk Ledelsens +1',
+             'Dusk Ledelsens', 'Hct. Leggings +1', 'Hct. Leggings', 'Zenith Pumps +1',
+             'Marduk\'s Crackows', 'Rostrum Pumps', 'Root Sabots', 'Rutter Sabatons',
+             'Marid Leggings +1', 'Ataractic Solea', 'Marid Leggings', 'Bk. Ledelsens +1',
+             'Akinji Nails', 'Desert Boots +1', 'Scp. Leggings +1', 'Battle Boots +1',
+             'Tabin Boots +1', 'Beak Ledelsens', 'Jaridah Nails', 'Scorpion Leggings',
+             'Dino Ledelsens', 'Raptor Ledelsens', 'Wool Socks +1', 'Cpc. Leggings +1',
+             'Wool Socks', 'Cpc. Leggings', 'C.C. Shoes +2', 'Cuir Highboots +1',
+             'Powder Boots', 'C.C. Shoes +1', 'Cuir Highboots', 'Ebony Sabots +1', 'Socks +1',
+             'Leggings +1', 'Rubious Pumps', 'Kingdom Clogs', 'Ebony Sabots',
+             'Shade Leggings +1', 'San d\'Orian Clogs', 'Air Solea +1', 'Chs. Sabots +1',
+             'Shade Leggings', 'Winged Boots +1', 'Great Gaiters', 'Kingdom Boots',
+             'Fine Ledelsens', 'Bone Leggings +1', 'San d\'Orian Boots', 'Republic Leggings',
+             'Garrison Boots', 'Lizard Ledelsens', 'Bone Leggings' },
     },
-    -- The same, with two changes a white mage subjob allows. The chest is
-    -- Gaudy Harness, whose latent gives refresh while MP is under 49, and the
-    -- neck leads with Stoneskin Torque: Stoneskin absorbs damage outright, so
-    -- enhancing it belongs in a set ordered for damage reduction. Neither is
-    -- worth a slot under a ninja subjob, which cannot cast Stoneskin at all.
-    ['Pulling_WHM_Priority'] = {
+    -- The white mage subjob delta, layered over Idle_Mit rather than repeating
+    -- it. Two slots differ under a white mage subjob: Gaudy Harness, whose
+    -- latent gives refresh while MP is under 49, and Stoneskin Torque, which
+    -- enhances a spell that absorbs damage outright and so belongs at the front
+    -- of a set ordered for damage reduction. Neither is worth a slot under a
+    -- ninja subjob, which cannot cast Stoneskin at all.
+    -- Layering is equivalent to the full list this replaces: resolution equips
+    -- the piece when it is carried and wearable, and leaves the slot to Idle_Mit
+    -- underneath when it is not -- which is exactly what a list led by that
+    -- piece did. Stoneskin Torque also appears inside Idle_Mit's own neck list;
+    -- promoting it here is what the white mage set used to spell out in full.
+    ['Idle_Mit_WHM_Priority'] = {
+        Neck  = { 'Stoneskin Torque' },
+        Body  = { 'Gaudy Harness' },
+    },
+    -- The enmity shedding idle mode, for when hate is the problem rather than
+    -- damage -- a pull gone wrong, or a cure that would peel the mob.
+    --
+    -- Ordered on Enmity- alone, most removed first. Where a slot has no Enmity-
+    -- piece the mitigation ladder shows through underneath, so the slot holds
+    -- the best defensive piece rather than nothing. Conditional enmity is
+    -- ignored the same way: Fenrir's Torque is Enmity -3 only at night, and
+    -- Horror Head's -50 needs a full moon on Darksday.
+    --
+    -- No white mage subjob set. Stoneskin Torque and Gaudy Harness are
+    -- mitigation and refresh, neither of which is what this mode is for.
+    ['Idle_Enmity_Priority'] = {
         Main  = { 'Terra\'s Staff', 'Earth Staff' },
         Ammo  = { 'Pebble' },
-        Head  = { 'Darksteel Cap +1', 'Darksteel Cap', 'Genbu\'s Kabuto', 'Hecatomb Cap +1',
-             'Hecatomb Cap', 'Dusk Mask +1', 'Io\'s helm', 'Dusk Mask', 'Zenith Crown +1',
-             'Zenith Crown', 'Carapace Helm +1', 'Scorpion Helm +1', 'Dartorgor\'s Coif',
-             'Troll Coif', 'Carapace Helm', 'Magus Keffiyeh', 'Beak Helm +1', 'Akinji Khud',
-             'Scorpion Mask +1', 'Beak Helm', 'Jaridah Khud', 'Scorpion Mask', 'T.M. Hat +2',
-             'Dino Helm', 'Magi Hat', 'Raptor Helm', 'Wool Cap +1', 'Carapace Mask +1',
-             'Wool Cap', 'Carapace Mask', 'Namru\'s Tiara', 'Corsair\'s Hat +1',
-             'Cuir Bandana +1', 'Cuir Bandana', 'Mage\'s Hat', 'Red Cap +1', 'Strong Cap',
-             'Sinister Mask', 'Velvet Hat', 'Red Cap', 'Shade Tiara +1', 'Trump Crown',
-             'Wool Hat +1', 'Shade Tiara', 'Great Headgear', 'Beetle Mask +1', 'Wool Hat',
-             'Cotton Headgear', 'Lizard Helm +1', 'Bone Mask +1', 'Kingdom Bandana',
-             'Republic Cap', 'Bonze\'s Circlet', 'Lizard Helm', 'Bone Mask', 'San. Bandana' },
-        Neck  = { 'Stoneskin Torque', 'Rho Necklace', 'Wivre Gorget +1', 'Tempered Chain',
-             'Wivre Gorget', 'Torama Gorget', 'Coeurl Gorget', 'Torque +1',
-             'Beak Necklace +1', 'Auditory Torque', 'Blue Gorget', 'Brisingamen +1',
-             'Chivalrous Chain', 'Fortified Chain', 'Torque', 'Beak Necklace',
-             'Intellect Torque', 'Storm Gorget', 'Carapace Gorget', 'Clay Amulet',
-             'Stone Gorget', 'Memento Muffler', 'Wolf Gorget +1', 'Checkered Scarf',
-             'Promise Badge', 'Qiqirn Collar', 'Brisingamen', 'Agile Gorget', 'Medieval Collar',
-             'Wolf Gorget', 'Holy Phial', 'Hemp Gorget +1', 'Green Gorget', 'Van Pendant',
-             'Paisley Scarf', 'Orochi Nodowa +1', 'M. No.17\'s Locket', 'Jagd Gorget',
-             'Mohbwa Scarf +1', 'Tiger Stole', 'Hemp Gorget', 'Beetle Gorget',
-             'Black Neckerchief', 'Feather Collar +1', 'Leather Gorget +1', 'Green Scarf',
-             'Orochi Nodowa', 'Dog Collar', 'Feather Collar', 'Justice Badge', 'Leather Gorget',
+        Head  = { 'Hydra Beret', 'Raven Beret', 'Crow Beret', 'Mahatma Hat', 'Errant Hat',
+             'Patroclus\'s Helm', 'Yigit Turban', 'Goliard Chapeau', 'Valkyrie\'s Hat',
+             'Marduk\'s Tiara', 'Shadow Hat', 'Chl. Roundlet +1', 'Choral Roundlet',
+             'Pumpkin Head', 'Darksteel Cap +1', 'Darksteel Cap', 'Genbu\'s Kabuto',
+             'Hecatomb Cap +1', 'Hecatomb Cap', 'Dusk Mask +1', 'Io\'s helm', 'Dusk Mask',
+             'Zenith Crown +1', 'Zenith Crown', 'Carapace Helm +1', 'Scorpion Helm +1',
+             'Dartorgor\'s Coif', 'Troll Coif', 'Carapace Helm', 'Magus Keffiyeh',
+             'Beak Helm +1', 'Akinji Khud', 'Scorpion Mask +1', 'Beak Helm', 'Jaridah Khud',
+             'Scorpion Mask', 'T.M. Hat +2', 'Dino Helm', 'Magi Hat', 'Raptor Helm',
+             'Wool Cap +1', 'Carapace Mask +1', 'Wool Cap', 'Carapace Mask', 'Namru\'s Tiara',
+             'Corsair\'s Hat +1', 'Cuir Bandana +1', 'Cuir Bandana', 'Mage\'s Hat',
+             'Red Cap +1', 'Strong Cap', 'Sinister Mask', 'Velvet Hat', 'Red Cap',
+             'Shade Tiara +1', 'Trump Crown', 'Wool Hat +1', 'Shade Tiara', 'Great Headgear',
+             'Beetle Mask +1', 'Wool Hat', 'Cotton Headgear', 'Lizard Helm +1',
+             'Bone Mask +1', 'Kingdom Bandana', 'Republic Cap', 'Bonze\'s Circlet',
+             'Lizard Helm', 'Bone Mask', 'San. Bandana' },
+        Neck  = { 'Benign Necklace', 'Lieutenant\'s Gorget', 'Sniper\'s Collar', 'Rho Necklace',
+             'Wivre Gorget +1', 'Tempered Chain', 'Wivre Gorget', 'Torama Gorget',
+             'Coeurl Gorget', 'Torque +1', 'Beak Necklace +1', 'Auditory Torque',
+             'Blue Gorget', 'Brisingamen +1', 'Chivalrous Chain', 'Fortified Chain',
+             'Stoneskin Torque', 'Torque', 'Beak Necklace', 'Intellect Torque',
+             'Storm Gorget', 'Carapace Gorget', 'Clay Amulet', 'Stone Gorget',
+             'Memento Muffler', 'Wolf Gorget +1', 'Checkered Scarf', 'Promise Badge',
+             'Qiqirn Collar', 'Brisingamen', 'Agile Gorget', 'Medieval Collar', 'Wolf Gorget',
+             'Holy Phial', 'Hemp Gorget +1', 'Green Gorget', 'Van Pendant', 'Paisley Scarf',
+             'Orochi Nodowa +1', 'M. No.17\'s Locket', 'Jagd Gorget', 'Mohbwa Scarf +1',
+             'Tiger Stole', 'Hemp Gorget', 'Beetle Gorget', 'Black Neckerchief',
+             'Feather Collar +1', 'Leather Gorget +1', 'Green Scarf', 'Orochi Nodowa',
+             'Dog Collar', 'Feather Collar', 'Justice Badge', 'Leather Gorget',
              'Shield Pendant', 'Windurstian Scarf', 'Bloodbead Amulet', 'Grandiose Chain' },
-        Ear1  = { 'Coral Earring', 'Merman\'s Earring', 'Intruder Earring', 'Bitter Earring',
-             'Cassie Earring', 'Hvn. Earring +1', 'Allure Earring +1', 'Lyt. Earring +1',
+        Ear1  = { 'Novia Earring', 'Storm Earring', 'Delta Earring', 'Hvn. Earring +1',
+             'Heavens Earring', 'Coral Earring', 'Merman\'s Earring', 'Intruder Earring',
+             'Bitter Earring', 'Cassie Earring', 'Allure Earring +1', 'Lyt. Earring +1',
              'Hope Earring +1', 'Chaotic Earring', 'Haten Earring', 'Priest\'s Earring',
              'Adroit Earring +1', 'Cmn. Earring +1', 'Cel. Earring +1', 'Genius Earring +1',
              'Grace Earring +1', 'Mana Earring +1', 'Ser. Earring +1', 'Victory Earring +1',
@@ -218,8 +305,9 @@ sets = {
              'Blc. Earring +1', 'Crg. Earring +1', 'Energy Earring +1', 'Kldg. Earring +1',
              'Optical Earring', 'Reflex Earring +1', 'Morukaka Earring', 'Stoic Earring',
              'Ethereal Earring', 'Insomnia Earring', 'Ryakho\'s Earring', 'Shield Earring' },
-        Ear2  = { 'Coral Earring', 'Merman\'s Earring', 'Intruder Earring', 'Bitter Earring',
-             'Cassie Earring', 'Hvn. Earring +1', 'Allure Earring +1', 'Lyt. Earring +1',
+        Ear2  = { 'Novia Earring', 'Storm Earring', 'Delta Earring', 'Hvn. Earring +1',
+             'Heavens Earring', 'Coral Earring', 'Merman\'s Earring', 'Intruder Earring',
+             'Bitter Earring', 'Cassie Earring', 'Allure Earring +1', 'Lyt. Earring +1',
              'Hope Earring +1', 'Chaotic Earring', 'Haten Earring', 'Priest\'s Earring',
              'Adroit Earring +1', 'Cmn. Earring +1', 'Cel. Earring +1', 'Genius Earring +1',
              'Grace Earring +1', 'Mana Earring +1', 'Ser. Earring +1', 'Victory Earring +1',
@@ -228,9 +316,11 @@ sets = {
              'Blc. Earring +1', 'Crg. Earring +1', 'Energy Earring +1', 'Kldg. Earring +1',
              'Optical Earring', 'Reflex Earring +1', 'Morukaka Earring', 'Stoic Earring',
              'Ethereal Earring', 'Insomnia Earring', 'Ryakho\'s Earring', 'Shield Earring' },
-        Body  = { 'Gaudy Harness', 'Dst. Harness +1', 'Darksteel Harness', 'Kirin\'s Osode',
-             'Hct. Harness +1', 'Dusk Jerkin', 'Hecatomb Harness', 'Vishnu\'s Vest',
-             'Narasimha\'s Vest', 'Scp. Brstplate +1', 'Dalmatica +1', 'Chl. Jstcorps +1',
+        Body  = { 'Hydra Doublet', 'Raven Jupon', 'Crow Jupon', 'Goliard Saio', 'Valkyrie\'s Coat',
+             'Mahatma Hpl.', 'Shadow Coat', 'Chl. Jstcorps +1', 'Errant Hpl.',
+             'Chl. Jstcorps', 'Enlil\'s Gambison', 'Dst. Harness +1', 'Darksteel Harness',
+             'Kirin\'s Osode', 'Hct. Harness +1', 'Dusk Jerkin', 'Hecatomb Harness',
+             'Vishnu\'s Vest', 'Narasimha\'s Vest', 'Scp. Brstplate +1', 'Dalmatica +1',
              'Silk Cloak +1', 'Scp. Breastplate', 'Cpc. Brstplate +1', 'Cpc. Breastplate',
              'Tundra Jerkin', 'Beak Jerkin +1', 'Shaman\'s Cloak', 'Akinji Peti',
              'Corsair\'s Frac', 'Beak Jerkin', 'R.K. Cloak +2', 'Jaridah Peti',
@@ -238,11 +328,14 @@ sets = {
              'Brigandine +1', 'C.C. Cloak +1', 'Brigandine', 'Wool Gambison +1',
              'Cpc. Harness +1', 'Cuir Bouilli +1', 'Cuir Bouilli', 'Cloak +1', 'Cloak',
              'Mana Cloak', 'Mage\'s Robe', 'Strong Harness', 'Velvet Robe', 'Faerie Tunic',
-             'Shade Harness +1', 'Wool Robe +1', 'Shade Harness', 'Mage\'s Tunic', 'Wool Robe',
-             'Great Doublet', 'Beetle Harness +1', 'Fine Jerkin', 'Garrison Tunica',
-             'Lizard Jerkin', 'Bone Harness +1', 'Priest\'s Robe', 'Bone Harness',
-             'Healing Harness', 'Kingdom Tunic' },
-        Hands = { 'Dst. Mittens +1', 'Prt. Bangles', 'Darksteel Mittens', 'Seiryu\'s Kote',
+             'Shade Harness +1', 'Wool Robe +1', 'Shade Harness', 'Mage\'s Tunic',
+             'Wool Robe', 'Great Doublet', 'Beetle Harness +1', 'Fine Jerkin',
+             'Garrison Tunica', 'Lizard Jerkin', 'Bone Harness +1', 'Priest\'s Robe',
+             'Bone Harness', 'Healing Harness', 'Kingdom Tunic' },
+        Hands = { 'Concealing Cuffs', 'Hydra Gloves', 'Raven Bracers', 'Crow Bracers',
+             'Marduk\'s Dastanas', 'Mahatma Cuffs', 'Errant Cuffs', 'Valkyrie\'s Cuffs',
+             'Choral Cuffs', 'Chl. Cuffs +1', 'Enlil\'s Kolluks', 'Shadow Cuffs',
+             'Dst. Mittens +1', 'Prt. Bangles', 'Darksteel Mittens', 'Seiryu\'s Kote',
              'Hct. Mittens +1', 'Dusk Gloves +1', 'Hecatomb Mittens', 'Dusk Gloves',
              'Zenith Mitts +1', 'Coral Bangles', 'Merman\'s Bangles', 'Zenith Mitts',
              'Cpc. Gauntlets +1', 'Magical Mitts', 'Fencing Bracers', 'Cpc. Gauntlets',
@@ -256,84 +349,93 @@ sets = {
              'Custom M Gloves', 'Wonder Mitts', 'Fine Gloves', 'Kingdom Gloves',
              'Republic Mittens', 'Lizard Gloves', 'Bone Mittens +1', 'San. Gloves',
              'Bastokan Mittens', 'Bone Mittens' },
-        Ring1 = { 'Defending Ring', 'Jelly Ring', 'Gobniu\'s Ring', 'Phalanx Ring',
-             'Unyielding Ring', 'Dragon Ring +1', 'Unfettered Ring', 'Aegis Ring',
-             'Dragon Ring', 'Cerberus Ring +1', 'Adroit Ring +1', 'Cmn. Ring +1',
-             'Hades Ring +1', 'Heavens Ring +1', 'Gld.Msk. Ring', 'Demon\'s Ring +1',
-             'Tiger Ring', 'Allure Ring +1', 'Celerity Ring +1', 'Genius Ring +1',
-             'Grace Ring +1', 'Kshama Ring No.4', 'Bloodbead Ring', 'Bomb Ring',
-             'Demon\'s Ring', 'Marid Ring +1', 'Earth Ring', 'Marksman\'s Ring',
-             'Alacrity Ring +1', 'Aura Ring +1', 'Deft Ring +1', 'Loyalty Ring +1',
-             'Puissance Ring +1', 'Solace Ring +1', 'Verve Ring +1', 'Leather Ring +1',
-             'Safeguard Ring', 'San d\'Orian Ring', 'Armored Ring', 'Balance Ring +1',
-             'Courage Ring +1', 'Energy Ring +1', 'Gold Ring +1', 'Gold Ring',
-             'Mythril Ring +1', 'Mythril Ring' },
-        Ring2 = { 'Defending Ring', 'Jelly Ring', 'Gobniu\'s Ring', 'Phalanx Ring',
-             'Unyielding Ring', 'Dragon Ring +1', 'Unfettered Ring', 'Aegis Ring',
-             'Dragon Ring', 'Cerberus Ring +1', 'Adroit Ring +1', 'Cmn. Ring +1',
-             'Hades Ring +1', 'Heavens Ring +1', 'Gld.Msk. Ring', 'Demon\'s Ring +1',
-             'Tiger Ring', 'Allure Ring +1', 'Celerity Ring +1', 'Genius Ring +1',
-             'Grace Ring +1', 'Kshama Ring No.4', 'Bloodbead Ring', 'Bomb Ring',
-             'Demon\'s Ring', 'Marid Ring +1', 'Earth Ring', 'Marksman\'s Ring',
-             'Alacrity Ring +1', 'Aura Ring +1', 'Deft Ring +1', 'Loyalty Ring +1',
-             'Puissance Ring +1', 'Solace Ring +1', 'Verve Ring +1', 'Leather Ring +1',
-             'Safeguard Ring', 'San d\'Orian Ring', 'Armored Ring', 'Balance Ring +1',
-             'Courage Ring +1', 'Energy Ring +1', 'Gold Ring +1', 'Gold Ring',
-             'Mythril Ring +1', 'Mythril Ring' },
-        Back  = { 'Shadow Mantle', 'Umbra Cape', 'Hexerei Cape', 'Cheviot Cape',
+        Ring1 = { 'Tamas Ring', 'Trooper\'s Ring', 'Serene Ring', 'Peace Ring', 'Defending Ring',
+             'Jelly Ring', 'Gobniu\'s Ring', 'Phalanx Ring', 'Unyielding Ring',
+             'Dragon Ring +1', 'Unfettered Ring', 'Aegis Ring', 'Dragon Ring',
+             'Cerberus Ring +1', 'Adroit Ring +1', 'Cmn. Ring +1', 'Hades Ring +1',
+             'Heavens Ring +1', 'Gld.Msk. Ring', 'Demon\'s Ring +1', 'Tiger Ring',
+             'Allure Ring +1', 'Celerity Ring +1', 'Genius Ring +1', 'Grace Ring +1',
+             'Kshama Ring No.4', 'Bloodbead Ring', 'Bomb Ring', 'Demon\'s Ring',
+             'Marid Ring +1', 'Earth Ring', 'Marksman\'s Ring', 'Alacrity Ring +1',
+             'Aura Ring +1', 'Deft Ring +1', 'Loyalty Ring +1', 'Puissance Ring +1',
+             'Solace Ring +1', 'Verve Ring +1', 'Leather Ring +1', 'Safeguard Ring',
+             'San d\'Orian Ring', 'Armored Ring', 'Balance Ring +1', 'Courage Ring +1',
+             'Energy Ring +1', 'Gold Ring +1', 'Gold Ring', 'Mythril Ring +1', 'Mythril Ring' },
+        Ring2 = { 'Tamas Ring', 'Trooper\'s Ring', 'Serene Ring', 'Peace Ring', 'Defending Ring',
+             'Jelly Ring', 'Gobniu\'s Ring', 'Phalanx Ring', 'Unyielding Ring',
+             'Dragon Ring +1', 'Unfettered Ring', 'Aegis Ring', 'Dragon Ring',
+             'Cerberus Ring +1', 'Adroit Ring +1', 'Cmn. Ring +1', 'Hades Ring +1',
+             'Heavens Ring +1', 'Gld.Msk. Ring', 'Demon\'s Ring +1', 'Tiger Ring',
+             'Allure Ring +1', 'Celerity Ring +1', 'Genius Ring +1', 'Grace Ring +1',
+             'Kshama Ring No.4', 'Bloodbead Ring', 'Bomb Ring', 'Demon\'s Ring',
+             'Marid Ring +1', 'Earth Ring', 'Marksman\'s Ring', 'Alacrity Ring +1',
+             'Aura Ring +1', 'Deft Ring +1', 'Loyalty Ring +1', 'Puissance Ring +1',
+             'Solace Ring +1', 'Verve Ring +1', 'Leather Ring +1', 'Safeguard Ring',
+             'San d\'Orian Ring', 'Armored Ring', 'Balance Ring +1', 'Courage Ring +1',
+             'Energy Ring +1', 'Gold Ring +1', 'Gold Ring', 'Mythril Ring +1', 'Mythril Ring' },
+        Back  = { 'Mahatma Cape', 'Errant Cape', 'Peace Cape +1', 'Peace Cape', 'Amity Cape',
+             'Sapient Cape', 'Talisman Cape', 'Esoteric Mantle', 'Miraculous Cape',
+             'Shadow Mantle', 'Umbra Cape', 'Hexerei Cape', 'Cheviot Cape',
              'Behem. Mantle +1', 'Behemoth Mantle', 'Marid Mantle +1', 'Empwr. Mantle +1',
-             'Marid Mantle', 'Mahatma Cape', 'Black Mantle +1', 'Feral Mantle',
-             'Desert Mantle +1', 'Errant Cape', 'Corse Cape', 'Beak Mantle +1',
-             'Ryl. Army Mantle', 'Cvl. Mantle +1', 'Lieutenant\'s Cape', 'Enhancing Mantle',
-             'Beak Mantle', 'Cvl. Mantle', 'Lightning Mantle', 'Dino Mantle',
-             'Rep. Army Mantle', 'Fed. Army Mantle', 'Jester\'s Cape +1', 'Volitional Mantle',
-             'Raptor Mantle', 'Bat Cape', 'Aurora Mantle +1', 'Sentinel\'s Mantle',
-             'Lucent Cape', 'Aurora Mantle', 'Red Cape +1', 'Ram Mantle', 'Ram Mantle +1',
-             'Wolf Mantle +1', 'Tundra Mantle', 'Black Cape +1', 'White Cape +1',
-             'Invisible Mantle', 'Wolf Mantle', 'Dhalmel Mantle +1', 'Nomad\'s Mantle +1',
-             'Night Cape', 'Variable Mantle', 'Cotton Cape +1', 'Dhalmel Mantle',
-             'Lizard Mantle +1', 'Mist Silk Cape', 'Talisman Cape', 'Nomad\'s Mantle',
-             'Variable Cape', 'Cotton Cape', 'Lizard Mantle' },
-        Waist = { 'Lieutenant\'s Sash', 'Forest Rope', 'Kaiser Belt', 'Marid Belt +1',
-             'Star Sash', 'Desert Sash', 'Forest Sash', 'Marid Belt', 'Czar\'s Belt',
-             'Koenigs Belt', 'Maharaja\'s Belt', 'Pendragon\'s Belt', 'Sultan\'s Belt',
-             'Anrin Obi', 'Dorin Obi', 'R.K. Belt +2', 'Earth Belt', 'R.K. Belt +1',
-             'Desert Belt', 'Forest Belt', 'Twinthread Obi +1', 'Ryl.Kgt. Belt',
-             'Brocade Obi +1', 'Swordbelt +1', 'Corsette +1', 'Qiqirn Sash +1', 'Jungle Belt',
-             'Ocean Belt', 'Brocade Obi', 'Swordbelt', 'Corsette', 'Qiqirn Sash', 'Gold Obi +1',
-             'Silver Belt +1', 'Survival Belt', 'Force Belt', 'Oracle\'s Belt',
-             'Deduct. Gold Obi', 'Enthrall. Gold Obi', 'Gold Obi', 'Sagac. Gold Obi',
-             'Mohbwa Sash +1', 'Silver Obi +1', 'Magic Belt +1', 'Lizard Belt +1',
-             'Warrior\'s Belt +1', 'Shaman\'s Belt', 'Mohbwa Sash', 'Silver Obi', 'Magic Belt',
-             'Lizard Belt', 'Friar\'s Rope', 'Heko Obi +1', 'Augmenting Belt' },
-        Legs  = { 'Goliard Trews', 'Dst. Subligar +1', 'Darksteel Subligar', 'Bahamut\'s Hose',
-             'Dusk Trousers +1', 'Dusk Trousers', 'Hct. Subligar +1', 'Hecatomb Subligar',
-             'Byakko\'s Haidate', 'Zenith Slacks +1', 'Beak Trousers +1', 'Akinji Salvars',
-             'Feral Trousers', 'Beak Trousers', 'Femina Subligar', 'Vir Subligar',
-             'Jaridah Salvars', 'Scp. Subligar +1', 'Tiger Trousers', 'Scorpion Subligar',
-             'Luna Subligar', 'Battle Hose +1', 'Tabin Hose +1', 'Dino Trousers',
-             'Silk Slacks +1', 'Ice Trousers', 'Raptor Trousers', 'Wool Hose +1',
-             'Cpc. Subligar +1', 'Blaze Hose', 'Wool Hose', 'Carapace Subligar',
-             'Cuir Trousers +1', 'Cuir Trousers', 'Mage\'s Slops', 'Hose +1',
-             'Iron Subligar +1', 'Velvet Slops', 'Hose', 'Iron Subligar', 'Shade Tights +1',
-             'Wool Slops +1', 'Kingdom Trousers', 'Shade Tights', 'Wool Slops',
-             'Republic Subligar', 'San. Trousers', 'Great Brais', 'Fine Trousers',
-             'Bone Subligar +1', 'Lizard Trousers', 'Bone Subligar', 'Angler\'s Hose',
-             'Nomad\'s Hose', 'Rider\'s Hose', 'Worker Hose' },
-        Feet  = { 'Dst. Leggings +1', 'Suzaku\'s Sune-Ate', 'Dst. Leggings',
-             'Dusk Ledelsens +1', 'Dusk Ledelsens', 'Hct. Leggings +1', 'Hct. Leggings',
-             'Zenith Pumps +1', 'Marduk\'s Crackows', 'Rostrum Pumps', 'Root Sabots',
-             'Rutter Sabatons', 'Marid Leggings +1', 'Ataractic Solea', 'Marid Leggings',
-             'Bk. Ledelsens +1', 'Akinji Nails', 'Desert Boots +1', 'Scp. Leggings +1',
-             'Battle Boots +1', 'Tabin Boots +1', 'Beak Ledelsens', 'Jaridah Nails',
-             'Scorpion Leggings', 'Dino Ledelsens', 'Raptor Ledelsens', 'Wool Socks +1',
-             'Cpc. Leggings +1', 'Wool Socks', 'Cpc. Leggings', 'C.C. Shoes +2',
-             'Cuir Highboots +1', 'Powder Boots', 'C.C. Shoes +1', 'Cuir Highboots',
-             'Ebony Sabots +1', 'Socks +1', 'Leggings +1', 'Rubious Pumps', 'Kingdom Clogs',
-             'Ebony Sabots', 'Shade Leggings +1', 'San d\'Orian Clogs', 'Air Solea +1',
-             'Chs. Sabots +1', 'Shade Leggings', 'Winged Boots +1', 'Great Gaiters',
-             'Kingdom Boots', 'Fine Ledelsens', 'Bone Leggings +1', 'San d\'Orian Boots',
-             'Republic Leggings', 'Garrison Boots', 'Lizard Ledelsens', 'Bone Leggings' },
+             'Marid Mantle', 'Black Mantle +1', 'Feral Mantle', 'Desert Mantle +1',
+             'Corse Cape', 'Beak Mantle +1', 'Ryl. Army Mantle', 'Cvl. Mantle +1',
+             'Lieutenant\'s Cape', 'Enhancing Mantle', 'Beak Mantle', 'Cvl. Mantle',
+             'Lightning Mantle', 'Dino Mantle', 'Rep. Army Mantle', 'Fed. Army Mantle',
+             'Jester\'s Cape +1', 'Volitional Mantle', 'Raptor Mantle', 'Bat Cape',
+             'Aurora Mantle +1', 'Sentinel\'s Mantle', 'Lucent Cape', 'Aurora Mantle',
+             'Red Cape +1', 'Ram Mantle', 'Ram Mantle +1', 'Wolf Mantle +1', 'Tundra Mantle',
+             'Black Cape +1', 'White Cape +1', 'Invisible Mantle', 'Wolf Mantle',
+             'Dhalmel Mantle +1', 'Nomad\'s Mantle +1', 'Night Cape', 'Variable Mantle',
+             'Cotton Cape +1', 'Dhalmel Mantle', 'Lizard Mantle +1', 'Mist Silk Cape',
+             'Nomad\'s Mantle', 'Variable Cape', 'Cotton Cape', 'Lizard Mantle' },
+        Waist = { 'Theta Sash', 'Buccaneer\'s Belt', 'Spectral Belt', 'Penitent\'s Rope',
+             'Healer\'s Belt', 'Talisman Obi', 'Immortal\'s Sash', 'Lieutenant\'s Sash',
+             'Forest Rope', 'Kaiser Belt', 'Marid Belt +1', 'Star Sash', 'Desert Sash',
+             'Forest Sash', 'Marid Belt', 'Czar\'s Belt', 'Koenigs Belt', 'Maharaja\'s Belt',
+             'Pendragon\'s Belt', 'Sultan\'s Belt', 'Anrin Obi', 'Dorin Obi', 'R.K. Belt +2',
+             'Earth Belt', 'R.K. Belt +1', 'Desert Belt', 'Forest Belt', 'Twinthread Obi +1',
+             'Ryl.Kgt. Belt', 'Brocade Obi +1', 'Swordbelt +1', 'Corsette +1',
+             'Qiqirn Sash +1', 'Jungle Belt', 'Ocean Belt', 'Brocade Obi', 'Swordbelt',
+             'Corsette', 'Qiqirn Sash', 'Gold Obi +1', 'Silver Belt +1', 'Survival Belt',
+             'Force Belt', 'Oracle\'s Belt', 'Deduct. Gold Obi', 'Enthrall. Gold Obi',
+             'Gold Obi', 'Sagac. Gold Obi', 'Mohbwa Sash +1', 'Silver Obi +1',
+             'Magic Belt +1', 'Lizard Belt +1', 'Warrior\'s Belt +1', 'Shaman\'s Belt',
+             'Mohbwa Sash', 'Silver Obi', 'Magic Belt', 'Lizard Belt', 'Friar\'s Rope',
+             'Heko Obi +1', 'Augmenting Belt' },
+        Legs  = { 'Hydra Brais', 'Raven Hose', 'Crow Hose', 'Goliard Trews', 'Mahatma Slops',
+             'Marduk\'s Shalwar', 'Errant Slops', 'Valkyrie\'s Trews', 'Shadow Trews',
+             'Choral Cannions', 'Enlil\'s Brayettes', 'Mercenary\'s Trousers',
+             'Dst. Subligar +1', 'Darksteel Subligar', 'Bahamut\'s Hose', 'Dusk Trousers +1',
+             'Dusk Trousers', 'Hct. Subligar +1', 'Hecatomb Subligar', 'Byakko\'s Haidate',
+             'Zenith Slacks +1', 'Beak Trousers +1', 'Akinji Salvars', 'Feral Trousers',
+             'Beak Trousers', 'Femina Subligar', 'Vir Subligar', 'Jaridah Salvars',
+             'Scp. Subligar +1', 'Tiger Trousers', 'Scorpion Subligar', 'Luna Subligar',
+             'Battle Hose +1', 'Tabin Hose +1', 'Dino Trousers', 'Silk Slacks +1',
+             'Ice Trousers', 'Raptor Trousers', 'Wool Hose +1', 'Cpc. Subligar +1',
+             'Blaze Hose', 'Wool Hose', 'Carapace Subligar', 'Cuir Trousers +1',
+             'Cuir Trousers', 'Mage\'s Slops', 'Hose +1', 'Iron Subligar +1', 'Velvet Slops',
+             'Hose', 'Iron Subligar', 'Shade Tights +1', 'Wool Slops +1', 'Kingdom Trousers',
+             'Shade Tights', 'Wool Slops', 'Republic Subligar', 'San. Trousers',
+             'Great Brais', 'Fine Trousers', 'Bone Subligar +1', 'Lizard Trousers',
+             'Bone Subligar', 'Angler\'s Hose', 'Nomad\'s Hose', 'Rider\'s Hose',
+             'Worker Hose' },
+        Feet  = { 'Arborist Nails', 'Hydra Gaiters', 'Raven Gaiters', 'Crow Gaiters',
+             'Marduk\'s Crackows', 'Avocat Pigaches', 'Mahatma Pigaches', 'Valkyrie\'s Clogs',
+             'Errant Pigaches', 'Shadow Clogs', 'Enlil\'s Crackows', 'Dst. Leggings +1',
+             'Suzaku\'s Sune-Ate', 'Dst. Leggings', 'Dusk Ledelsens +1', 'Dusk Ledelsens',
+             'Hct. Leggings +1', 'Hct. Leggings', 'Zenith Pumps +1', 'Rostrum Pumps',
+             'Root Sabots', 'Rutter Sabatons', 'Marid Leggings +1', 'Ataractic Solea',
+             'Marid Leggings', 'Bk. Ledelsens +1', 'Akinji Nails', 'Desert Boots +1',
+             'Scp. Leggings +1', 'Battle Boots +1', 'Tabin Boots +1', 'Beak Ledelsens',
+             'Jaridah Nails', 'Scorpion Leggings', 'Dino Ledelsens', 'Raptor Ledelsens',
+             'Wool Socks +1', 'Cpc. Leggings +1', 'Wool Socks', 'Cpc. Leggings',
+             'C.C. Shoes +2', 'Cuir Highboots +1', 'Powder Boots', 'C.C. Shoes +1',
+             'Cuir Highboots', 'Ebony Sabots +1', 'Socks +1', 'Leggings +1', 'Rubious Pumps',
+             'Kingdom Clogs', 'Ebony Sabots', 'Shade Leggings +1', 'San d\'Orian Clogs',
+             'Air Solea +1', 'Chs. Sabots +1', 'Shade Leggings', 'Winged Boots +1',
+             'Great Gaiters', 'Kingdom Boots', 'Fine Ledelsens', 'Bone Leggings +1',
+             'San d\'Orian Boots', 'Republic Leggings', 'Garrison Boots', 'Lizard Ledelsens',
+             'Bone Leggings' },
     },
     -- Singing skill and CHR, worn for every song. The instrument for the
     -- song family goes on top of this.
@@ -786,6 +888,122 @@ evalLevel = function()
     common.EvalLevel(level);
 end
 
+-- Drop the cached bag scan once, then re-resolve every table the profile owns
+-- against it. The first EvaluateOwned pays for the walk and repopulates the
+-- cache; the rest resolve from it, so a refresh reads the bags once however
+-- many tables it touches. Resolving each table with EvaluateGear(force) would
+-- invalidate the shared cache again per table and walk the bags once each.
+-- Returns false when the bags could not be read, in which case every set keeps
+-- the gear it already had rather than being blanked.
+local RefreshGear = function()
+    local level = Settings.CurrentLevel;
+
+    common.InvalidateScan();
+
+    local ok = common.EvaluateOwned(profile.Sets, level);
+    common.EvaluateOwned(profile.Songs, level);
+    common.EvaluateOwned(staves.Sets, level);
+
+    return ok;
+end
+
+local FindIdleMode = function(cmd)
+    if (cmd == nil) then
+        return nil;
+    end
+
+    for index, mode in ipairs(IdleModes) do
+        if (mode.Cmd == cmd) then
+            return index;
+        end
+    end
+
+    return nil;
+end
+
+-- Switching re-resolves against the bags so a mode picks up gear acquired
+-- since the last scan instead of resolving empty and silently doing nothing.
+local SetIdleMode = function(index)
+    Settings.IdleMode = index;
+
+    local mode = IdleModes[index];
+    if (RefreshGear()) then
+        gFunc.Message('idle mode: ' .. mode.Label);
+    else
+        gFunc.Message('idle mode: ' .. mode.Label
+            .. ' (bags unreadable, gear left as-is)');
+    end
+end
+
+-- What can be typed. Built by walking the registry rather than spelled out, so
+-- a mode that exists is always listed and one that is removed stops being
+-- listed -- a help that has to be kept in step by hand is a help that lies.
+--
+-- Only what BRD actually acts on is named. ReservedCommands is deliberately
+-- wider: 'acc' is reserved because common.SetMeleeOptions claims it in the jobs
+-- that wire it, but BRD does not wire it, so listing it would advertise a
+-- command that does nothing here.
+--
+-- Every Message call prints its own '[LuAshitacast]' header, so the listing is
+-- kept to eight lines with the two modes registered -- the six toggles go two
+-- to a row rather than one each. It grows a line per mode added, which is the
+-- point: the modes are what it exists to show.
+-- One column for every row, wide enough for the longest pairing ('sneak invis'
+-- and 'help  modes' are both eleven) with two spaces to spare.
+local HelpRow = function(marker, cmd, label)
+    gFunc.Message(string.format('%s%-13s%s', marker, cmd, label));
+end
+
+local ShowHelp = function()
+    gFunc.Message('/brd commands:');
+    HelpRow('   ', 'help  modes', 'this list, or the idle modes alone');
+    HelpRow('   ', 'gear', 'rescan the bags and report every set');
+
+    for index, mode in ipairs(IdleModes) do
+        local marker = '   ';
+        if (index == Settings.IdleMode) then
+            marker = ' * ';
+        end
+        HelpRow(marker, mode.Cmd, mode.Label);
+    end
+
+    for i = 1, #UtilityCommands, 2 do
+        local a, b = UtilityCommands[i], UtilityCommands[i + 1];
+        if (b == nil) then
+            HelpRow('   ', a.Cmd, a.Label);
+        else
+            HelpRow('   ', a.Cmd .. ' ' .. b.Cmd, a.Label .. ' / ' .. b.Label);
+        end
+    end
+end
+
+local ListIdleModes = function()
+    gFunc.Message('idle modes:');
+
+    for index, mode in ipairs(IdleModes) do
+        local marker = '   ';
+        if (index == Settings.IdleMode) then
+            marker = ' * ';
+        end
+        gFunc.Message(marker .. mode.Cmd .. '  ' .. mode.Label);
+    end
+end
+
+-- A mode sharing a word with a command handled ahead of it would never fire,
+-- because the earlier handler consumes the word first. Say so at load rather
+-- than leaving it to be found in game.
+local CheckIdleModes = function()
+    for _, mode in ipairs(IdleModes) do
+        for _, reserved in ipairs(ReservedCommands) do
+            if (mode.Cmd == reserved) then
+                gFunc.Message('idle mode "' .. mode.Cmd
+                    .. '" collides with the reserved command "' .. reserved
+                    .. '" and will never fire');
+            end
+        end
+    end
+end
+
 -- Song families that have an instrument of their own. The names do not
 -- overlap, so the first match wins.
 local songFamilies = {
@@ -823,6 +1041,8 @@ profile.OnLoad = function()
 
     AshitaCore:GetChatManager():QueueCommand(-1, '/macro book ' .. Settings.MacroBook);
 
+    CheckIdleModes();
+
     -- Lock appearance a few seconds after loading
     common.RequestLockStyle(1);
 end
@@ -837,9 +1057,28 @@ profile.HandleCommand = function(args)
 
     -- Rescan the bags and re-resolve every gear set
     if (args[1] == 'gear') then
-        common.EvaluateGear(profile.Sets, Settings.CurrentLevel, true);
-        common.EvaluateGear(profile.Songs, Settings.CurrentLevel, true);
+        RefreshGear();
         common.ReportGear(profile.Sets, Settings.CurrentLevel);
+        return;
+    end
+
+    -- With no argument, or with 'help', show everything that can be typed
+    if (args[1] == nil) or (args[1] == 'help') then
+        ShowHelp();
+        return;
+    end
+
+    -- 'modes' stays the focused list, for when only the modes matter
+    if (args[1] == 'modes') then
+        ListIdleModes();
+        return;
+    end
+
+    -- Switch the idle mode. An unrecognised word is left alone: it may belong
+    -- to a handler above, and nothing here should react to it.
+    local index = FindIdleMode(args[1]);
+    if (index ~= nil) then
+        SetIdleMode(index);
     end
 end
 
@@ -857,10 +1096,13 @@ profile.HandleDefault = function()
 		gFunc.EquipSet(sets.MinstrelClear);
 	end
 
-	if (player.SubJob == 'WHM') then
-		gFunc.EquipSet(profile.Sets.Pulling_WHM);
-	else
-		gFunc.EquipSet(profile.Sets.Pulling_NIN);
+	local mode = IdleModes[Settings.IdleMode];
+	gFunc.EquipSet(profile.Sets[mode.Set]);
+
+	-- Over the mode's set, not instead of it: a slot whose subjob piece is not
+	-- carried keeps whatever the mode put there.
+	if (mode.WHM ~= nil) and (player.SubJob == 'WHM') then
+		gFunc.EquipSet(profile.Sets[mode.WHM]);
 	end
 
 	if (player.Status == 'Resting') then
