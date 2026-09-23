@@ -1,2 +1,5 @@
 __pycache__/
 *.pyc
+
+# Harvested wiki data: regenerate with tools/harvest.py rather than tracking it
+tools/wikidata/
