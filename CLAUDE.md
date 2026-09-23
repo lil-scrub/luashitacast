@@ -17,6 +17,7 @@ There is no build step, linting, or test runner — changes take effect by reloa
 Each job has its own profile file (`WAR.lua`, `BRD.lua`, `BLM.lua`, etc.) that follows a standard LuAshitacast interface. Two shared modules are loaded by most job files:
 
 - **`common.lua`** — cross-job gear sets (Dream set, melee priority slots, flex slots)
+- **`lists.lua`** — priority slot lists shared by more than one job (accessory slots of the caster Idle/TP/Cure/Enhancing/Enfeebling sets); a job drops one straight into a slot, e.g. `Ear1 = lists.TP.Ear`
 - **`utility.lua`** — cross-job toggle options (exp ring, warp club, sneak/invis gear, fishing) and item/cast handlers; loads `fishing.lua`
 - **`fishing.lua`** — fishing gear set and macro book switching logic
 - **`staves.lua`** — elemental staff selection by spell name (used by caster jobs)
@@ -63,5 +64,7 @@ Sets use two naming conventions:
 **Adding a new job:** Copy an existing job file, replace the sets and job-specific logic. Register the alias in `OnLoad`/`OnUnload`. The file name must match what LuAshitacast expects for the job.
 
 **Adding gear to a priority set:** Append items to the priority list in order of preference (best first). Items the player can't yet equip are skipped automatically.
+
+**Editing a shared list:** A slot set to `lists.<Family>.<Slot>` is shared — changing it in `lists.lua` changes every job named in that list's `Used by:` comment. When one job wants a different order, give it its own inline list and drop it from that comment.
 
 **Utility toggles** (`exp`, `warp`, `sneak`, `invis`, `fish`) are forwarded from any job's `HandleCommand` via `utility.SetOptions(args[1], ...)`. The fishing toggle also switches macro books (book 20 for fishing, restores original book on disable).
