@@ -35,7 +35,7 @@ proves it; steps 4 and 5 are content and are expected to differ.
 - [x] 3.3 Verify the dump shows `Idle_Mit` unchanged and `Idle_Mit_WHM` reduced
       to two slots, about 620 duplicated gear entries and roughly 140 lines of
       `BRD.lua` removed
-- [ ] 3.4 Confirm in game under a white mage subjob that `Stoneskin Torque` and
+- [x] 3.4 Confirm in game under a white mage subjob that `Stoneskin Torque` and
       `Gaudy Harness` are still worn when carried, and that the twelve other
       slots match what a ninja subjob equips
 
@@ -138,7 +138,7 @@ proves it; steps 4 and 5 are content and are expected to differ.
       mitigation mode under a white mage subjob
 - [x] 9.5 Verify the enmity mode keeps `Hydra Doublet` in `Body` when MP is at
       or above 49, confirming the gate returns the slot to the mode
-- [ ] 9.6 Confirm in game: with a white mage subjob, cast until MP drops below
+- [x] 9.6 Confirm in game: with a white mage subjob, cast until MP drops below
       49 and check the refresh body appears in both `/brd mit` and `/brd enmity`,
       and leaves once MP is back above the threshold
 
@@ -147,7 +147,7 @@ proves it; steps 4 and 5 are content and are expected to differ.
 - [x] 10.1 Run `luac -p` over every Lua file in the repo and verify all pass
 - [x] 10.2 Verify every other job profile's dump is byte-identical to its baseline,
       confirming nothing outside `BRD.lua` was disturbed
-- [ ] 10.3 Reload in game and verify the full loop: both modes switch, the subjob
+- [x] 10.3 Reload in game and verify the full loop: both modes switch, the subjob
       gear applies, songs cast and return to the active mode's gear afterwards,
       and resting still equips the resting staff
 - [x] 10.4 Update `CLAUDE.md` to document the mode registry alongside the existing
