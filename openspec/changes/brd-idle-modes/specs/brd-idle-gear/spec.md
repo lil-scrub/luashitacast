@@ -224,6 +224,10 @@ mode declares it, that gear SHALL take precedence over the mode's own choice in
 the slots it covers, and SHALL apply only when the subjob is white mage. Where a
 mode declares none, the subjob SHALL NOT change what that mode equips.
 
+This covers gear whose value is tied to what a particular mode is scoring for.
+Gear that is useful under a white mage subjob regardless of the active mode
+belongs to the conditional gear requirement below instead.
+
 #### Scenario: White mage subjob with a mode that declares subjob gear
 
 - **WHEN** the mitigation mode is active, the subjob is white mage, and the
@@ -247,6 +251,46 @@ mode declares none, the subjob SHALL NOT change what that mode equips.
 
 - **WHEN** any mode is active and the subjob is not white mage
 - **THEN** no subjob gear is applied
+
+### Requirement: Gear whose benefit is conditional applies across every mode
+
+Some gear earns its slot only while a game condition holds, and that condition
+is independent of what any mode is scoring for. The profile SHALL support gear
+declared with a condition, applied over whichever mode is active rather than
+belonging to one, and only while its condition holds. When the condition does
+not hold, the active mode's own choice for those slots SHALL stand.
+
+The white mage refresh body is such a piece: its latent gives refresh only while
+MP is below 49 points, so it SHALL be equipped only when the subjob is white
+mage and MP is below that threshold, whichever mode is active.
+
+#### Scenario: Condition holds while the mitigation mode is active
+
+- **WHEN** the mitigation mode is active, the subjob is white mage, MP is below
+  49, and the refresh body is carried
+- **THEN** the refresh body is equipped over the mode's own body choice
+
+#### Scenario: Condition holds while the enmity mode is active
+
+- **WHEN** the enmity mode is active, the subjob is white mage, MP is below 49,
+  and the refresh body is carried
+- **THEN** the refresh body is equipped over the mode's own body choice
+
+#### Scenario: MP is at or above the threshold
+
+- **WHEN** any mode is active, the subjob is white mage, and MP is 49 or above
+- **THEN** the refresh body is not equipped, and the active mode's own body
+  choice stands
+
+#### Scenario: The subjob is not white mage
+
+- **WHEN** any mode is active, MP is below 49, and the subjob is not white mage
+- **THEN** the refresh body is not equipped
+
+#### Scenario: Conditional gear is not carried
+
+- **WHEN** the condition holds but the conditional gear is not carried
+- **THEN** the active mode's own choice for those slots remains equipped
 
 ### Requirement: Song handling is unaffected by the active mode
 

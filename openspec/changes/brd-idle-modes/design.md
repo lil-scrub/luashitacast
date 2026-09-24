@@ -203,6 +203,41 @@ to belong there.
 `/lac list`, `/lac list <set>` and `/lac list gui`, and duplicating it here
 would be a second, worse implementation.
 
+### 12. Conditional gear is its own list, applied over whichever mode is active
+
+Decision 4 hangs the white mage gear off each mode, on the reasoning that
+`Stoneskin Torque` is mitigation and `Gaudy Harness` is refresh, so neither
+belongs on an `Enmity-` set. In play that reasoning only held for one of them.
+Refresh is orthogonal to what either mode scores for, so the player wants
+`Gaudy Harness` under a white mage subjob whichever mode is active -- which
+Decision 4 makes impossible, since a mode either declares the gear or does not.
+
+Conditional gear therefore becomes a second list, applied after the active mode
+and its subjob set, each entry pairing a gear set with a predicate over player
+state. `Stoneskin Torque` stays per-mode under Decision 4; `Gaudy Harness` moves
+here.
+
+The condition is not decoration. Forcing the refresh body on unconditionally
+would cost the enmity mode `Hydra Doublet` at Enmity -9, the best enmity body it
+has, in exchange for a latent that is inactive most of the time. Gating on the
+latent's own trigger -- MP below 49 points -- means the slot is only spent while
+the refresh is actually running.
+
+Gating costs nothing in refresh terms. The latent switches off at 49 MP whether
+or not the piece is worn, so MP behaves identically either way; the gate only
+returns the body slot to the mode when the latent is dormant.
+
+*On swap churn:* crossing the threshold swaps the body, but bard songs cost no
+MP, so the only thing that takes a bard below 49 is subjob casting. Crossings
+are occasional rather than continuous and no hysteresis band is warranted. If
+play proves otherwise, a band -- on below 49, off above roughly 55 -- is the fix,
+and it belongs in the predicate rather than anywhere else.
+
+*Alternative considered:* letting every mode declare the refresh body in its own
+subjob set. It works, but it duplicates the piece and its condition once per
+mode, and every mode added later has to remember to repeat it. The point of the
+registry is that a mode is one row.
+
 ## Risks / Trade-offs
 
 - **Re-scoring reaches further than a reorder** → The head of most of the
@@ -224,6 +259,11 @@ would be a second, worse implementation.
   the absence of layering order and cross-set contention. If a third and fourth
   mode make the duplication painful, the shared-slot extraction already used in
   `lists.lua` is the escape hatch.
+
+- **A predicate runs every tick** -> Conditional gear is evaluated in
+  `HandleDefault`, so its predicate runs as often as the profile ticks. Keep
+  predicates to reads of `gData.GetPlayer()` and comparisons; anything that
+  scans bags or allocates belongs elsewhere.
 
 - **Help can still drift for anything outside the registry** -> The utility
   toggle descriptions are hand-written, so a toggle added to `utility.lua` will

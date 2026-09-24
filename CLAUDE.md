@@ -78,7 +78,12 @@ lists every command the profile accepts and marks the active mode, and
 registry, so it cannot go stale; it names only what BRD acts on, which is why
 `acc` is reserved but not listed. Switching re-resolves every gear table from
 a single bag scan. **Adding a mode is one registry row plus its gear set** — no
-handler changes. Mode command words must avoid `ReservedCommands`, which the
+handler changes. A mode may declare an optional `WHM` set for gear whose value
+is tied to that mode's purpose. Gear that is useful regardless of the active
+mode goes in `Conditionals` instead — a set paired with a predicate over the
+player, applied over whichever mode is active while its condition holds (the
+refresh body under a white mage subjob below 49 MP). Those predicates run every
+tick, so keep them to reads of `gData.GetPlayer()` and comparisons. Mode command words must avoid `ReservedCommands`, which the
 profile checks at load.
 
 **Utility toggles** (`exp`, `warp`, `sneak`, `invis`, `fish`) are forwarded from any job's `HandleCommand` via `utility.SetOptions(args[1], ...)`. The fishing toggle also switches macro books (book 20 for fishing, restores original book on disable).

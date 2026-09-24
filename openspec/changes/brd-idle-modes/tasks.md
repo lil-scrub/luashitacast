@@ -120,14 +120,36 @@ proves it; steps 4 and 5 are content and are expected to differ.
 - [x] 8.6 Verify adding a throwaway mode to the registry makes it appear in the
       help with no other edit, then remove it
 
-## 9. Final checks
+## 9. Conditional gear
 
-- [x] 9.1 Run `luac -p` over every Lua file in the repo and verify all pass
-- [x] 9.2 Verify every other job profile's dump is byte-identical to its baseline,
+- [x] 9.1 Add a `Refresh_WHM_Priority` set holding `Gaudy Harness` in `Body`,
+      and remove `Gaudy Harness` from `Idle_Mit_WHM_Priority` so that set is
+      `Stoneskin Torque` in `Neck` alone; verify `Idle_Mit_WHM` resolves to one
+      slot and the new set to one
+- [x] 9.2 Add a conditional list next to the mode registry, each entry pairing a
+      set name with a predicate over the player, holding one entry: the refresh
+      body when the subjob is white mage and MP is below 49; verify
+      `luac -p BRD.lua` passes
+- [x] 9.3 Apply the conditional list in `HandleDefault` after the active mode
+      and its subjob set; verify with the harness that the refresh body is
+      equipped under both modes at MP 20 and under neither at MP 60
+- [x] 9.4 Verify the subjob still gates it: at MP 20 with a ninja subjob the
+      refresh body is not equipped, and `Stoneskin Torque` still applies in the
+      mitigation mode under a white mage subjob
+- [x] 9.5 Verify the enmity mode keeps `Hydra Doublet` in `Body` when MP is at
+      or above 49, confirming the gate returns the slot to the mode
+- [ ] 9.6 Confirm in game: with a white mage subjob, cast until MP drops below
+      49 and check the refresh body appears in both `/brd mit` and `/brd enmity`,
+      and leaves once MP is back above the threshold
+
+## 10. Final checks
+
+- [x] 10.1 Run `luac -p` over every Lua file in the repo and verify all pass
+- [x] 10.2 Verify every other job profile's dump is byte-identical to its baseline,
       confirming nothing outside `BRD.lua` was disturbed
-- [ ] 9.3 Reload in game and verify the full loop: both modes switch, the subjob
+- [ ] 10.3 Reload in game and verify the full loop: both modes switch, the subjob
       gear applies, songs cast and return to the active mode's gear afterwards,
       and resting still equips the resting staff
-- [x] 9.4 Update `CLAUDE.md` to document the mode registry alongside the existing
+- [x] 10.4 Update `CLAUDE.md` to document the mode registry alongside the existing
       utility-toggle notes; verify it names the commands and says that adding a
       mode is one registry row plus its gear set

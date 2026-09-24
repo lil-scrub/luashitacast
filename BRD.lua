@@ -43,6 +43,27 @@ local UtilityCommands = {
 	{ Cmd = 'fish',  Label = 'fishing set and macro book' },
 };
 
+-- Gear that earns its slot only while a game condition holds, applied over
+-- whichever mode is active rather than belonging to one. Each entry pairs a set
+-- with a predicate over the player.
+--
+-- The predicate runs every tick, from HandleDefault, so it must stay a read of
+-- gData.GetPlayer() and a comparison. Anything that scans bags or allocates
+-- belongs elsewhere.
+--
+-- Gaudy Harness' latent is live while MP is below 49 points -- below, so 49
+-- itself is already off. Gating on the latent's own trigger costs nothing in
+-- refresh terms, because the latent stops at 49 whether or not the piece is
+-- worn; it only hands the body slot back to the mode while the effect is
+-- dormant. Bard songs cost no MP, so only subjob casting takes the bard under
+-- the threshold and the swap is occasional rather than continuous.
+local Conditionals = {
+	{ Set = 'Refresh_WHM',
+	  When = function(player)
+		return (player.SubJob == 'WHM') and (player.MP < 49);
+	  end },
+};
+
 -- Command words that never reach a mode. The utility options are consumed by
 -- utility.SetOptions and the accuracy option by common.SetMeleeOptions, both
 -- of which run before the mode lookup; gear and modes are the profile's own.
@@ -236,11 +257,13 @@ sets = {
              'Garrison Boots', 'Lizard Ledelsens', 'Bone Leggings' },
     },
     -- The white mage subjob delta, layered over Idle_Mit rather than repeating
-    -- it. Two slots differ under a white mage subjob: Gaudy Harness, whose
-    -- latent gives refresh while MP is under 49, and Stoneskin Torque, which
-    -- enhances a spell that absorbs damage outright and so belongs at the front
-    -- of a set ordered for damage reduction. Neither is worth a slot under a
-    -- ninja subjob, which cannot cast Stoneskin at all.
+    -- it. One slot: Stoneskin Torque, which enhances a spell that absorbs
+    -- damage outright and so belongs at the front of a set ordered for damage
+    -- reduction. It is worth nothing under a ninja subjob, which cannot cast
+    -- Stoneskin at all, and nothing on the enmity set either -- which is what
+    -- makes it per-mode rather than conditional.
+    -- Gaudy Harness used to live here too. It does not belong to a mode: see
+    -- Refresh_WHM below.
     -- Layering is equivalent to the full list this replaces: resolution equips
     -- the piece when it is carried and wearable, and leaves the slot to Idle_Mit
     -- underneath when it is not -- which is exactly what a list led by that
@@ -248,6 +271,12 @@ sets = {
     -- promoting it here is what the white mage set used to spell out in full.
     ['Idle_Mit_WHM_Priority'] = {
         Neck  = { 'Stoneskin Torque' },
+    },
+    -- Conditional, not part of any mode. Gaudy Harness gives refresh while MP
+    -- is under 49, which is worth a body slot in either mode -- but only while
+    -- the latent is actually live. Worn permanently it would cost the enmity
+    -- mode Hydra Doublet at Enmity -9 in exchange for a dormant effect.
+    ['Refresh_WHM_Priority'] = {
         Body  = { 'Gaudy Harness' },
     },
     -- The enmity shedding idle mode, for when hate is the problem rather than
@@ -1103,6 +1132,14 @@ profile.HandleDefault = function()
 	-- carried keeps whatever the mode put there.
 	if (mode.WHM ~= nil) and (player.SubJob == 'WHM') then
 		gFunc.EquipSet(profile.Sets[mode.WHM]);
+	end
+
+	-- Over the mode and its subjob set, so a live condition wins the slot and a
+	-- dormant one leaves whatever the mode chose.
+	for _, conditional in ipairs(Conditionals) do
+		if (conditional.When(player)) then
+			gFunc.EquipSet(profile.Sets[conditional.Set]);
+		end
 	end
 
 	if (player.Status == 'Resting') then

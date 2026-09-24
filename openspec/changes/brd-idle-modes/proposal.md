@@ -33,6 +33,12 @@ cannot serve both, and today there is no mechanism to swap between them.
   the profiles are either state echoes or the gear report, so a command is
   discoverable only by reading the Lua. The listing is generated from the mode
   registry rather than written out, so adding a mode cannot leave it stale.
+- Add **conditional gear**, applied over whichever mode is active while a
+  condition holds. `Gaudy Harness` moves here from the mitigation mode's subjob
+  set: its latent gives refresh only while MP is below 49 points, and that is
+  worth having under a white mage subjob in either mode -- but only while the
+  latent is live, since forcing it on permanently would cost the enmity mode
+  `Hydra Doublet` at Enmity -9.
 - **BREAKING (profile-internal):** rename `Pulling_NIN` / `Pulling_WHM` to the
   `Idle_*` family. The name no longer describes the set — it is worn while
   standing, resting, meleeing and pulling alike.
