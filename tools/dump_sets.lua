@@ -13,7 +13,9 @@
 -- resolved head, and is invisible in the resolved output alone.
 
 local here = string.match(arg[0], '^(.*)[/\\][^/\\]*$') or '.';
-local root = here .. '/..';
+-- The profiles are the directory this one lives in. LAC_PROFILE overrides it,
+-- for running against another copy of them.
+local root = os.getenv('LAC_PROFILE') or (here .. '/..');
 package.path = here .. '/?.lua;' .. package.path;
 
 local stub = require('lacstub');
