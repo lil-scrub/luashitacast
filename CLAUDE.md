@@ -86,4 +86,28 @@ refresh body under a white mage subjob below 49 MP). Those predicates run every
 tick, so keep them to reads of `gData.GetPlayer()` and comparisons. Mode command words must avoid `ReservedCommands`, which the
 profile checks at load.
 
+**Conditional gear and the rune-axe mode (BST):** `BST.lua` carries the same
+`Conditionals` list BRD has — a set paired with a predicate over the player,
+applied every tick over whatever else is on — plus one thing BRD does not need:
+a **release**. BST equips nothing while idle, so each entry names the slots it
+claims and those slots are handed back to the resolved melee set the moment the
+condition lapses; without that the piece stays on with its reason gone. Releases
+run before the live sets, because two entries can name the same gear.
+`Gaudy Harness` is claimed by two entries for different reasons: refresh under
+`/WHM` below 49 MP, and per-axe HP regen under `/NIN` while `/bst rune` is on
+(no MP test — the regen does not care). `/bst rune` also takes `Main`/`Sub` from
+`RuneAxe_Priority` while engaged under `/NIN`, because the engaged weapon swap
+would otherwise put the picks back every tick. The mode is inert under any other
+subjob.
+
+**Scoring a gear ladder:** the ladders are scored by hand from
+`tools/wikidata/items.json` and **conditional stats do not count** — a latent, an
+enchantment, a set bonus, a stat that only applies in one activity or against one
+monster family, and anything gated on the moon or time of day. Ties go to the
+piece usable at the lower level. Entry names must be the game's **short** names
+(`Hct. Subligar +1`, not `Hecatomb Subligar +1`): that is what a bag scan
+matches, and the wiki data has only the long ones, so names come from the item
+API the way `tools/bf_harvest.py` does it. `tools/dump_sets.lua` expands a
+profile outside the game so a re-scored ladder can be diffed.
+
 **Utility toggles** (`exp`, `warp`, `sneak`, `invis`, `fish`) are forwarded from any job's `HandleCommand` via `utility.SetOptions(args[1], ...)`. The fishing toggle also switches macro books (book 20 for fishing, restores original book on disable).
