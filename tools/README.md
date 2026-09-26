@@ -27,6 +27,8 @@ Point `LAC_PROFILE` at another copy to work against that instead:
 | `bf_value.py` | Prints what each battlefield is worth in gil per clear |
 | `wikidata/ksnm/`, `wikidata/bcnm/` | One directory per harvested category |
 | `wikidata/prices.json` | Auction prices, shared across categories and keyed by in-game name |
+| `audit_ladders.py` | Checks every ladder entry in a job profile against the game item API |
+| `wikidata/api/` | The item API's name index and the details the audit has looked up |
 | `lacstub.lua` | Stubbed LuAshitacast globals: loads a job profile outside the game against a fake inventory |
 | `dump_sets.lua` | Dumps a profile's resolved sets, its ladders, and what its handlers equip, for diffing a re-score |
 
@@ -107,8 +109,21 @@ usually the actual reason to run the fight.
 game's short names (`Dst. Harness +1`), which is what the bag scan matches
 against. The wiki calls that page `Darksteel Harness +1`. Roughly 13% of the
 entries in an existing set differ this way, so a name taken straight from the
-wiki may silently never equip. Check it against a name already used in the
-profiles before adding it.
+wiki may silently never equip.
+
+**The wiki is not the authority on the job list either**, nor on what the
+server actually has. It says Peacock Amulet is closed to dragoons where the API
+says All Jobs; it lists the Silver line as dragoon gear where the API does not;
+and it documents items Horizon never shipped (`Chivalrous Chain`, `Io's Mail`).
+Score from the wiki, then run the audit before the ladder goes in:
+
+    python3 tools/audit_ladders.py BST
+
+It reads the ladders out of the profile and prints every entry the item API
+cannot place -- a name that is no item, a piece the job cannot wear, one past
+the level cap, one listed under the wrong slot -- and nothing at all when the
+job is clean. Both failures it catches are silent in game: a bad entry is
+skipped exactly the way an entry you have not got yet is skipped.
 
 **Conditional stats have to be ignored**, the rule commit `ecad9f2` set. The
 condition is often in its own chunk ahead of the stat rather than beside it:

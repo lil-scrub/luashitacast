@@ -245,9 +245,10 @@ Rollback is per step; nothing here writes state outside the profile.
 
 ## Open Questions
 
-- **The exact short names of the rune axes.** Confirmed with `/bst gear` while
-  carrying them during step 2. Deferrable: it changes the strings in one
-  two-slot list and nothing about the specs, the approach or the steps.
+- ~~**The exact short names of the rune axes.**~~ Resolved from the game item
+  API, which carries the axes the harvested wiki data does not. `Rune Axe` is
+  the whole list: `Rune Chopper` shares the name but is a two-handed great axe
+  the API closes to beastmasters, so it could never have equipped.
 - **Whether the rune-axe list wants more than one axe per slot.** Resolved
   during step 2 by what the character actually owns; the set resolves the same
   way whether the list is one entry long or five.

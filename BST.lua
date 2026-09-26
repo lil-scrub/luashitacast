@@ -66,12 +66,16 @@ local sets = {
 	-- Rune axes, wielded as a pair while the rune mode is on under a ninja
 	-- subjob. Gaudy Harness gives 5 HP regen per axe held, which is the whole
 	-- point of the mode; the picks hit harder, so this is a trade the player
-	-- asks for rather than one the profile makes on its own. Both entries are
-	-- listed in both slots: the bag scan claims an item once, so owning one of
-	-- each wields both and owning two of one wields the pair.
+	-- asks for rather than one the profile makes on its own.
+	--
+	-- Rune Axe is the only entry there can be: Rune Chopper shares the name but
+	-- is a two-handed great axe the item API closes to beastmasters, and no
+	-- other weapon triggers the harness. The same name stands in both slots
+	-- because the bag scan claims a copy once, so carrying two wields the pair
+	-- and carrying one leaves the sub hand where it was.
 	['RuneAxe_Priority'] = {
-        Main = {'Rune Chopper', 'Rune Axe'},
-        Sub = {'Rune Chopper', 'Rune Axe'},
+        Main = {'Rune Axe'},
+        Sub = {'Rune Axe'},
 	},
     -- Melee. Multipliers first -- haste, then double and triple attack -- then
     -- flat attack, then STR, then accuracy and the rest. Multipliers lead
@@ -86,19 +90,21 @@ local sets = {
     -- ignored, so those pieces rank on their base stats or not at all.
     --
     -- Where two pieces tie, the one usable at the lower level leads: identical
-    -- stats, fewer levels to wait. Scored from tools/wikidata/items.json; the
-    -- names are the game's short names, which is what a bag scan matches.
+    -- stats, fewer levels to wait. Scored from tools/wikidata/items.json, then
+    -- every entry checked against the game item API with tools/audit_ladders.py:
+    -- the wiki has items Horizon never shipped and spells the rest with their
+    -- long names, and a bag scan matches only the short ones.
     ['Tp_Priority'] = {
         Head  = { 'Askar Zucchetto', 'Skadi\'s Visor', 'Panther Mask +1',
-             'Patroclus\'s Helm', 'Panther Mask', 'Brigand\'s Mask', 'Breeder Mask',
+             'Patroclus\'s Helm', 'Panther Mask', 'Breeder Mask',
              'Walahra Turban', 'Ogre Mask +1', 'Ogre Mask', 'Adaman Celata',
              'Valkyrie\'s Mask', 'Aurum Armet', 'Celata', 'Celata +1', 'Akinji Khud',
              'Super Ribbon', 'Shock Mask', 'Alumine Salade', 'Luisant Salade',
              'Freya\'s Mask', 'Fed. Headgear', 'Win. Headgear', 'Freyr\'s Mask',
-             'Emperor Hairpin', 'Shepherd\'s Bonnet', 'Njord\'s Mask' },
+             'Emperor Hairpin', 'Shep. Bonnet', 'Njord\'s Mask' },
         Neck  = { 'Dream Collar', 'Orochi Nodowa +1', 'Storm Gorget', 'Orochi Nodowa',
              'Grand T.K. Collar', 'Tiger Stole', 'Ryl.Grd. Collar', 'Ajase Beads',
-             'R.K. Army Collar', 'Justice Torque', 'Chivalrous Chain', 'Qiqirn Collar',
+             'R.K. Army Collar', 'Justice Torque', 'Qiqirn Collar',
              'Diabolos\'s Torque', 'Sniper\'s Collar', 'Peacock Amulet',
              'Peacock Charm', 'Fang Necklace', 'Spike Necklace' },
         Ear1  = { 'Brutal Earring', 'Merman\'s Earring', 'Assault Earring',
@@ -113,11 +119,11 @@ local sets = {
              'Beetle Earring', 'Ocl. Earring', 'Triton Earring', 'Minuet Earring',
              'Platinum Earring', 'Gold Earring', 'Gold Earring +1',
              'Mythril Earring +1', 'Reraise Earring', 'Bone Earring', 'Optical Earring' },
-        Body  = { 'Askar Korazin', 'Io\'s Mail', 'Byrnie +1', 'Byrnie',
+        Body  = { 'Askar Korazin', 'Byrnie +1', 'Byrnie',
              'Assault Jerkin', 'Adaman Hauberk', 'Aurum Cuirass', 'Haubergeon +1',
              'Hauberk +1', 'Haubergeon', 'Hauberk', 'Ryl.Sqr. Chnml. +2',
              'Ryl.Kgt. Chainmail', 'Alumine Haubert', 'Luisant Haubert',
-             'Irn.Msk.Gmbsn. +1', 'Shepherd\'s Doublet', 'Savage Separates',
+             'Irn.Msk.Gmbsn. +1', 'Shep. Doublet', 'Savage Separates',
              'Wonder Kaftan', 'Freyr\'s Jerkin', 'Garrison Tunica', 'Njord\'s Jerkin' },
         Hands = { 'Dusk Gloves +1', 'Dusk Gloves', 'Armada Mufflers', 'Askar Manopolas',
              'Aurum Gauntlets', 'Spiked Fng.Gnt.', 'Tarasque Mitts +1',
@@ -146,7 +152,7 @@ local sets = {
              'Commander\'s Cape', 'Ryl. Army Mantle', 'Rep. Army Mantle' },
         Waist = { 'Ninurta\'s Sash', 'Sonic Belt', 'Sonic Belt +1', 'Speed Belt',
              'Swift Belt', 'Quick Belt', 'Swordbelt +1', 'Swordbelt', 'Zeta Sash',
-             'Vanguard Belt', 'Master Belt', 'Buccaneer\'s Belt', 'Corsair\'s Belt',
+             'Vanguard Belt', 'Master Belt', 'Corsair\'s Belt',
              'Sultan\'s Belt', 'Fire Belt', 'Potent Belt', 'R.K. Belt +1',
              'R.K. Belt +2', 'Acrobat\'s Belt', 'Barbarian\'s Belt', 'Brave belt' },
         Legs  = { 'Byakko\'s Haidate', 'Barb. Zerehs', 'Skadi\'s Chausses',
@@ -165,7 +171,7 @@ local sets = {
              'Thick Sollerets', 'Thick Sollerets +1', 'Abtal Boots', 'Sipahi Boots',
              'Storm Gambieras', 'Alumine Sollerets', 'Luisant Sollerets',
              'Freya\'s Ledelsens', 'Win. Gaiters', 'Savage Gaiters', 'Wonder Clomps',
-             'Shepherd\'s Boots', 'Njord\'s Ledelsens', 'Bounding Boots',
+             'Shep. Boots', 'Njord\'s Ledelsens', 'Bounding Boots',
              'Leaping Boots' },
     },
     -- Charm. The unrestricted Charm bonus first, then CHR, then gear that
@@ -195,7 +201,7 @@ local sets = {
              'Beast Jackcoat', 'Kirin\'s Osode', 'Skadi\'s Cuirie', 'Brave\'s Jacket',
              'Stout Jacket', 'Bison Jacket', 'Khimaira Jacket', 'Gaudy Harness',
              'Byrnie', 'Byrnie +1', 'Black Cotehardie', 'Flora Cotehardie',
-             'Brigandine +1', 'Argent Coat', 'Ceremonial Dress', 'Freya\'s Jerkin',
+             'Brigandine +1', 'Ceremonial Dress', 'Freya\'s Jerkin',
              'Fed. Doublet', 'Win. Doublet', 'Freyr\'s Jerkin', 'Garrison Tunica' },
         Hands = { 'Monster Gloves', 'Mst. Gloves +1', 'Bst. Gloves +1', 'Beast Gloves',
              'Trainer\'s Gloves', 'Trainer\'s Wrist.', 'Marine F Gloves',
@@ -214,7 +220,7 @@ local sets = {
              'R.K. Belt +2' },
         Legs  = { 'Bst. Trousers +1', 'Beast Trousers', 'Monster Trousers',
              'Mst. Trousers +1', 'Cln. Subligar +1', 'Clown\'s Subligar',
-             'Dst. Codpiece', 'Luna Subligar', 'Elder\'s Braguette', 'Platino Hose',
+             'Dst. Codpiece', 'Luna Subligar', 'Elder\'s Braguette',
              'Custom Pants', 'Custom Slacks', 'Bison Kecks', 'Coral Subligar',
              'Merman\'s Subligar', 'Ceremonial Hose' },
         Feet  = { 'Monster Gaiters', 'Mst. Gaiters +1', 'Bst. Gaiters +1',
@@ -234,16 +240,16 @@ local sets = {
     -- Pet: stat carried here sticks for the life of the pet. The broth
     -- is equipped after this, so it keeps the ammo slot.
     ['CallBeast_Priority'] = {
-        Head  = { 'Beast Helm +1', 'Beast Helm', 'Buffalo Helm', 'Shepherd\'s Bonnet' },
+        Head  = { 'Bst. Helm +1', 'Beast Helm', 'Buffalo Helm', 'Shep. Bonnet' },
         Ear1  = { 'Beastly Earring' },
         Ear2  = { 'Beastly Earring' },
-        Body  = { 'Shepherd\'s Doublet' },
+        Body  = { 'Shep. Doublet' },
         Hands = { 'Monster Gloves', 'Mst. Gloves +1', 'Beast Bazubands',
-             'Shepherd\'s Bracers' },
+             'Shep. Bracers' },
         Ring1 = { 'Spirited Ring' },
         Ring2 = { 'Spirited Ring' },
-        Legs  = { 'Askar Dirs', 'Shepherd\'s Hose' },
-        Feet  = { 'Shepherd\'s Boots' },
+        Legs  = { 'Askar Dirs', 'Shep. Hose' },
+        Feet  = { 'Shep. Boots' },
     },
 	['Reward_Priority'] = {
         Ammo = {'Pet Fd. Epsilon', 'Pet Food Delta', 'Pet Fd. Gamma', 'Pet Food Beta'},

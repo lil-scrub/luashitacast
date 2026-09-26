@@ -110,4 +110,15 @@ matches, and the wiki data has only the long ones, so names come from the item
 API the way `tools/bf_harvest.py` does it. `tools/dump_sets.lua` expands a
 profile outside the game so a re-scored ladder can be diffed.
 
+The API is also the authority on **what the server has and which jobs may wear
+it**, and the wiki disagrees often enough to matter — it documents items Horizon
+never shipped (`Chivalrous Chain`, `Io's Mail`) and lists gear under jobs that
+cannot equip it. Score from the wiki, then run
+`python3 tools/audit_ladders.py <JOB>`, which reads the ladders out of the
+profile and names every entry the API cannot place: no such item, a job that
+cannot wear it, one past the level cap, one listed under the wrong slot. A
+ladder goes in only once that reports the job clean — both failures are silent
+in game, since a bad entry is skipped exactly the way one you have not got yet
+is skipped.
+
 **Utility toggles** (`exp`, `warp`, `sneak`, `invis`, `fish`) are forwarded from any job's `HandleCommand` via `utility.SetOptions(args[1], ...)`. The fishing toggle also switches macro books (book 20 for fishing, restores original book on disable).

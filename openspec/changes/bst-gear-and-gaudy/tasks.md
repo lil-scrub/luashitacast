@@ -1,7 +1,7 @@
 # Tasks
 
 Ordered so the mechanism lands before the content, per design.md — Migration
-Plan. Each of the four groups leaves `BST.lua` in a loadable, playable state.
+Plan. Every group leaves `BST.lua` in a loadable, playable state.
 
 ## 1. Conditional gear and the white mage case
 
@@ -39,9 +39,12 @@ Plan. Each of the four groups leaves `BST.lua` in a loadable, playable state.
       Verify `/bst rune` flips and prints the state, and that `gear`, `jug`,
       `acc` and the six utility words still reach their existing handlers
       unchanged.
-- [ ] 2.2 Add `RuneAxe_Priority` with `Main` and `Sub` only. Verify against the
+- [x] 2.2 Add `RuneAxe_Priority` with `Main` and `Sub` only. Verify against the
       names `/bst gear` reports while the axes are carried — the open question
       in design.md — rather than the wiki, since the harvested data has no axes.
+      Answered from the game item API instead, which carries the axes the
+      harvested data does not: `Rune Axe` is the only entry, and `Rune Chopper`
+      is a two-handed great axe closed to beastmasters.
 - [x] 2.3 Branch the engaged weapon swap: `/NIN` with the mode on equips
       `sets.RuneAxe`, `/NIN` with it off equips `sets.DualWield`, every other
       subjob equips `sets.Axe` as today. Verify all three paths in the dump from
@@ -107,3 +110,17 @@ Plan. Each of the four groups leaves `BST.lua` in a loadable, playable state.
       gear and rune-axe mode, in the style of the existing BRD idle-modes entry.
       Verify the entry names the release step, since that is what differs from
       BRD's version.
+
+## 6. Audit every entry against the item API
+
+- [x] 6.1 Add `tools/audit_ladders.py`: read a profile's ladders and report each
+      entry the item API cannot place — no such item, a job that cannot wear it,
+      one past the level cap, one listed under the wrong slot. Verify it finds
+      the eight Silver-line entries `DRG.lua` is known to carry and nothing in
+      `WAR.lua`.
+- [x] 6.2 Fix what it finds in `BST.lua`: drop the six entries Horizon has no
+      item for (`Brigand's Mask`, `Chivalrous Chain`, `Io's Mail`,
+      `Buccaneer's Belt`, `Argent Coat`, `Platino Hose`), and respell the six
+      written with long names the bag scan can never match (the `Shepherd's`
+      line, `Beast Helm +1`). Verify the audit reports the job clean and that
+      the dump moves only those entries.
