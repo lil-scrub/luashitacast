@@ -324,6 +324,7 @@ end
 profile.OnLoad = function()
     gSettings.AllowAddSet = true;
     AshitaCore:GetChatManager():QueueCommand(-1, '/alias /smn /lac fwd');
+    utility.OnLoad();
 
     -- Lock appearance a few seconds after loading
     common.RequestLockStyle(1);
@@ -331,11 +332,12 @@ end
 
 profile.OnUnload = function()
     AshitaCore:GetChatManager():QueueCommand(-1, '/alias delete /smn');
+    utility.OnUnload();
 end
 
 profile.HandleCommand = function(args)
     -- Handle utility settings
-    utility.SetOptions(args[1]);
+    utility.SetOptions(args);
 
     -- Rescan the bags and re-resolve every gear set
     if (args[1] == 'gear') then

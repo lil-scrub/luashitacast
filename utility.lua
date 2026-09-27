@@ -61,7 +61,13 @@ local function releaseSet(name)
     gFunc.EquipSet(clearSets[name]);
 end
 
-profile.SetOptions = function(option, arg)
+-- Every job hands the whole argument list over, rather than only its first
+-- word, so a shared command can take a subcommand of its own: fishing reads
+-- args[2] and beyond. The toggles below read args[1] and behave as they always
+-- have.
+profile.SetOptions = function(args, book)
+    local option = args[1];
+
     if (option == 'exp') then
         Settings.UseExperience = not Settings.UseExperience;
         if (not Settings.UseExperience) then
@@ -97,8 +103,13 @@ profile.SetOptions = function(option, arg)
         end
         gFunc.Message('use clamming set: ' .. tostring(Settings.UseClam));
     end
-    if (option == 'fish') then
-        fishing.Toggle(arg);
+
+    -- The word '/fish' forwards. It is deliberately not 'fish': the alias body
+    -- is what produces it, so '/<job> fish' cannot reach here and falls through
+    -- as an unrecognised word. The leading underscore marks it as a word the
+    -- player is not meant to type.
+    if (option == '_fish') then
+        fishing.HandleCommand(args, book);
     end
 end
 
@@ -161,6 +172,21 @@ profile.CheckItem = function(name)
 	if (name == 'Silent Oil') then
 		gFunc.EquipSet(sets.Sneak);
 	end
+end
+
+-- Fishing is reached by its own word under every job, rather than through the
+-- job's alias, so the word does not change when the job does. There is no
+-- profile-independent place to register a command -- anything typed comes back
+-- through the loaded profile's HandleCommand -- so this is a second alias
+-- forwarding into the same handler, registered and deleted with the profile the
+-- way every other alias in this project is. Each job calls the pair from its
+-- own OnLoad/OnUnload.
+profile.OnLoad = function()
+    AshitaCore:GetChatManager():QueueCommand(-1, '/alias /fish /lac fwd _fish');
+end
+
+profile.OnUnload = function()
+    AshitaCore:GetChatManager():QueueCommand(-1, '/alias delete /fish');
 end
 
 profile.CheckCast = function(name)

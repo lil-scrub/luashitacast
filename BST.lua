@@ -348,6 +348,7 @@ end
 profile.OnLoad = function()
     gSettings.AllowAddSet = true;
 	AshitaCore:GetChatManager():QueueCommand(-1, '/alias /bst /lac fwd');
+	utility.OnLoad();
 
     AshitaCore:GetChatManager():QueueCommand(-1, '/macro book ' .. Settings.MacroBook);
 
@@ -364,11 +365,12 @@ end
 
 profile.OnUnload = function()
 	AshitaCore:GetChatManager():QueueCommand(-1, '/alias delete /bst');
+	utility.OnUnload();
 end
 
 profile.HandleCommand = function(args)
     -- Handle utility settings
-    utility.SetOptions(args[1], Settings.MacroBook);
+    utility.SetOptions(args, Settings.MacroBook);
 
     -- Handle common settings
     common.SetMeleeOptions(args[1]);

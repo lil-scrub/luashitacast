@@ -18,8 +18,8 @@ Each job has its own profile file (`WAR.lua`, `BRD.lua`, `BLM.lua`, etc.) that f
 
 - **`common.lua`** — cross-job gear sets (Dream set, melee priority slots, flex slots)
 - **`lists.lua`** — priority slot lists shared by more than one job (accessory slots of the caster Idle/TP/Cure/Enhancing/Enfeebling sets); a job drops one straight into a slot, e.g. `Ear1 = lists.TP.Ear`
-- **`utility.lua`** — cross-job toggle options (exp ring, warp club, sneak/invis gear, fishing) and item/cast handlers; loads `fishing.lua`
-- **`fishing.lua`** — fishing gear set and macro book switching logic
+- **`utility.lua`** — cross-job toggle options (exp ring, warp club, sneak/invis gear, clamming) and item/cast handlers; registers the shared `/fish` alias; loads `fishing.lua`
+- **`fishing.lua`** — the `/fish` command: the fishing gear set, the rod and bait registries, and macro book switching
 - **`staves.lua`** — elemental staff selection by spell name (used by caster jobs)
 - **`settings.lua`** — LuAshitacast addon settings (bags, delays, offsets)
 - **`tools/`** — not loaded by the game: the HorizonXI wiki harvester and the
@@ -121,4 +121,21 @@ ladder goes in only once that reports the job clean — both failures are silent
 in game, since a bad entry is skipped exactly the way one you have not got yet
 is skipped.
 
-**Utility toggles** (`exp`, `warp`, `sneak`, `invis`, `fish`) are forwarded from any job's `HandleCommand` via `utility.SetOptions(args[1], ...)`. The fishing toggle also switches macro books (book 20 for fishing, restores original book on disable).
+**Utility toggles** (`exp`, `warp`, `sneak`, `invis`, `clam`) are forwarded from
+any job's `HandleCommand` via `utility.SetOptions(args, ...)`, which is handed
+the whole argument list so a shared command can take a subcommand of its own.
+
+**The `/fish` command:** fishing is not a job-forwarded toggle — it has its own
+alias, registered by `utility.OnLoad` and deleted by `utility.OnUnload`, which
+every job calls next to its own alias lines. The alias forwards the word `_fish`
+rather than `fish`, so `/fish` is the only way to produce the word
+`utility.SetOptions` routes to `fishing.HandleCommand`; `/<job> fish` reaches
+nothing and falls through. `/fish` alone toggles the set and the macro book (20
+for fishing, the job's own book on disable, or none for the five jobs that
+declare none); `/fish rod <name>` and `/fish bait <name>` choose tackle from the
+ordered `Rods` and `Baits` registries in `fishing.lua` and turn fishing on if it
+is off; `/fish rod` and `/fish bait` with no name list the choices; `/fish help`
+lists every accepted word and what is selected. A selection writes its item into
+`sets.Fishing.Range`/`.Ammo` rather than being read per tick, and tackle names
+are the game's **short** names taken from the item API the way every gear name in
+this project is.

@@ -40,7 +40,6 @@ local UtilityCommands = {
 	{ Cmd = 'sneak', Label = 'sneak feet' },
 	{ Cmd = 'invis', Label = 'invisible hands' },
 	{ Cmd = 'clam',  Label = 'clamming set' },
-	{ Cmd = 'fish',  Label = 'fishing set and macro book' },
 };
 
 -- Gear that earns its slot only while a game condition holds, applied over
@@ -71,7 +70,6 @@ local Conditionals = {
 -- the collision is reported at load rather than left to be discovered in game.
 local ReservedCommands = {
 	'gear', 'modes', 'help', 'acc', 'exp', 'warp', 'sneak', 'invis', 'clam',
-	'fish',
 };
 
 sets = {
@@ -974,7 +972,7 @@ end
 -- command that does nothing here.
 --
 -- Every Message call prints its own '[LuAshitacast]' header, so the listing is
--- kept to eight lines with the two modes registered -- the six toggles go two
+-- kept to eight lines with the two modes registered -- the five toggles go two
 -- to a row rather than one each. It grows a line per mode added, which is the
 -- point: the modes are what it exists to show.
 -- One column for every row, wide enough for the longest pairing ('sneak invis'
@@ -1067,6 +1065,7 @@ end
 profile.OnLoad = function()
     gSettings.AllowAddSet = true;
 	AshitaCore:GetChatManager():QueueCommand(-1, '/alias /brd /lac fwd');
+	utility.OnLoad();
 
     AshitaCore:GetChatManager():QueueCommand(-1, '/macro book ' .. Settings.MacroBook);
 
@@ -1078,11 +1077,12 @@ end
 
 profile.OnUnload = function()
 	AshitaCore:GetChatManager():QueueCommand(-1, '/alias delete /brd');
+	utility.OnUnload();
 end
 
 profile.HandleCommand = function(args)
     -- Handle utility settings
-    utility.SetOptions(args[1], Settings.MacroBook);
+    utility.SetOptions(args, Settings.MacroBook);
 
     -- Rescan the bags and re-resolve every gear set
     if (args[1] == 'gear') then

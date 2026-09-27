@@ -445,6 +445,7 @@ end
 profile.OnLoad = function()
     gSettings.AllowAddSet = true;
     AshitaCore:GetChatManager():QueueCommand(-1, '/alias /blm /lac fwd');
+    utility.OnLoad();
 
     AshitaCore:GetChatManager():QueueCommand(-1, '/macro book ' .. Settings.MacroBook);
 
@@ -454,11 +455,12 @@ end
 
 profile.OnUnload = function()
     AshitaCore:GetChatManager():QueueCommand(-1, '/alias delete /blm');
+    utility.OnUnload();
 end
 
 profile.HandleCommand = function(args)
     -- Handle utility settings
-    utility.SetOptions(args[1], Settings.MacroBook);
+    utility.SetOptions(args, Settings.MacroBook);
 
     -- Rescan the bags and re-resolve every gear set
     if (args[1] == 'gear') then

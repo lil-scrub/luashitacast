@@ -32,6 +32,7 @@ end
 profile.OnLoad = function()
     gSettings.AllowAddSet = true;
 	AshitaCore:GetChatManager():QueueCommand(-1, '/alias /drg /lac fwd');
+	utility.OnLoad();
 
     -- Lock appearance a few seconds after loading
     common.RequestLockStyle(1);
@@ -39,11 +40,12 @@ end
 
 profile.OnUnload = function()
 	AshitaCore:GetChatManager():QueueCommand(-1, '/alias delete /drg');
+	utility.OnUnload();
 end
 
 profile.HandleCommand = function(args)
     -- Handle utility settings
-    utility.SetOptions(args[1]);
+    utility.SetOptions(args);
 
     -- Handle common settings
     common.SetMeleeOptions(args[1]);
