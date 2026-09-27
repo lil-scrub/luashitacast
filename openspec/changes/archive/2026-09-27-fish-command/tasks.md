@@ -86,18 +86,18 @@
 
 ## 6. Verify in game
 
-- [ ] 6.1 Load each of the ten job profiles once and type `/fsh help` under it;
+- [x] 6.1 Load each of the ten job profiles once and type `/fsh help` under it;
       verify the listing appears under every job and that no Lua error is
       printed on load or on the first utility command.
-- [ ] 6.2 With fishing off, type `/fsh rod lu`; verify the rod is reported,
+- [x] 6.2 With fishing off, type `/fsh rod lu`; verify the rod is reported,
       fishing turns on, the angler's set and `Lu Shang's F. Rod` are equipped,
       and the macro book switches to 20.
-- [ ] 6.3 Type `/fsh bait worm`, then `/fsh`; verify the bait changes without
+- [x] 6.3 Type `/fsh bait worm`, then `/fsh`; verify the bait changes without
       the book switching again, then that fishing turns off and the macro book
       returns to the job's own book under a job that declares one (`BST`) and
       stays on 20 under one that does not (`WAR`).
-- [ ] 6.4 Type `/fsh rod nonsense` and `/fsh nonsense` with fishing off;
+- [x] 6.4 Type `/fsh rod nonsense` and `/fsh nonsense` with fishing off;
       verify each reports an unrecognised name and that fishing stays off with
       the previous selections intact.
-- [ ] 6.5 Type `/bst fish` (and the equivalent under one other job); verify
+- [x] 6.5 Type `/bst fish` (and the equivalent under one other job); verify
       nothing happens — no gear change, no macro book change, no message.
