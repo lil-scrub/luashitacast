@@ -2,8 +2,8 @@
 
 ## 1. Confirm the alias can carry the forwarded word
 
-- [ ] 1.1 In game, register `/alias /fish /lac fwd _fish` by hand and type
-      `/fish rod lu`; verify the loaded profile's `HandleCommand` receives
+- [x] 1.1 In game, register `/alias /fsh /lac fwd _fish` by hand and type
+      `/fsh rod lu`; verify the loaded profile's `HandleCommand` receives
       `args = {'_fish', 'rod', 'lu'}` (print the arguments from `HandleCommand`
       temporarily, or watch for the "unrecognised" path). This is the assumption
       the whole approach rests on — see design.md, Risks; if the alias body
@@ -36,8 +36,8 @@
       into `sets.Fishing.Range` / `.Ammo`, reports the choice, and calls
       `setFishing(true, book)`; an unlisted word reports itself unrecognised and
       leaves both the selection and the fishing state alone. Verify from the
-      scratch script that `/fish bait worm` changes `sets.Fishing.Ammo`, turns
-      fishing on from off, and that a second `/fish bait` does not re-issue the
+      scratch script that `/fsh bait worm` changes `sets.Fishing.Ammo`, turns
+      fishing on from off, and that a second `/fsh bait` does not re-issue the
       macro book command.
 - [x] 2.6 Implement the listings: `rod` and `bait` with no name list their
       `Cmd`s with the current selection marked, and `help` lists every accepted
@@ -48,8 +48,8 @@
 ## 3. Shared alias and the utility entry point
 
 - [x] 3.1 In `utility.lua`, add `profile.OnLoad` registering
-      `/alias /fish /lac fwd _fish` and `profile.OnUnload` deleting it. Verify
-      in game (after task 4) that `/fish` works under a job and is gone after
+      `/alias /fsh /lac fwd _fish` and `profile.OnUnload` deleting it. Verify
+      in game (after task 4) that `/fsh` works under a job and is gone after
       the profile is unloaded.
 - [x] 3.2 Change `utility.SetOptions` to take `(args, book)`, reading `args[1]`
       internally so the existing toggles behave exactly as before, and route
@@ -79,24 +79,24 @@
 
 - [x] 5.1 Update the "Utility toggles" paragraph in `CLAUDE.md`: the toggles are
       `exp`, `warp`, `sneak`, `invis`, `clam`, forwarded from a job's
-      `HandleCommand`; fishing is now a shared `/fish` command registered by
+      `HandleCommand`; fishing is now a shared `/fsh` command registered by
       `utility.OnLoad`, with its own rod and bait subcommands and its tackle
       names taken from the item API. Verify the paragraph names no command the
       code does not accept.
 
 ## 6. Verify in game
 
-- [ ] 6.1 Load each of the ten job profiles once and type `/fish help` under it;
+- [ ] 6.1 Load each of the ten job profiles once and type `/fsh help` under it;
       verify the listing appears under every job and that no Lua error is
       printed on load or on the first utility command.
-- [ ] 6.2 With fishing off, type `/fish rod lu`; verify the rod is reported,
+- [ ] 6.2 With fishing off, type `/fsh rod lu`; verify the rod is reported,
       fishing turns on, the angler's set and `Lu Shang's F. Rod` are equipped,
       and the macro book switches to 20.
-- [ ] 6.3 Type `/fish bait worm`, then `/fish`; verify the bait changes without
+- [ ] 6.3 Type `/fsh bait worm`, then `/fsh`; verify the bait changes without
       the book switching again, then that fishing turns off and the macro book
       returns to the job's own book under a job that declares one (`BST`) and
       stays on 20 under one that does not (`WAR`).
-- [ ] 6.4 Type `/fish rod nonsense` and `/fish nonsense` with fishing off;
+- [ ] 6.4 Type `/fsh rod nonsense` and `/fsh nonsense` with fishing off;
       verify each reports an unrecognised name and that fishing stays off with
       the previous selections intact.
 - [ ] 6.5 Type `/bst fish` (and the equivalent under one other job); verify

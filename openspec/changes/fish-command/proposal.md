@@ -11,20 +11,22 @@ in `fishing.lua`, so swapping bait means editing the file and reloading.
 
 ## What Changes
 
-- Register a `/fish` alias that works under every job profile, alongside the
-  job's own alias rather than inside it. `/fish` with no argument toggles the
-  fishing set and the macro book exactly as `/<job> fish` does today.
+- Register a `/fsh` alias that works under every job profile, alongside the
+  job's own alias rather than inside it. `/fsh` with no argument toggles the
+  fishing set and the macro book exactly as `/<job> fish` does today. Not
+  `/fish`: an Ashita alias shadows what the player types, and `/fish` is the
+  game's own command for casting a line.
 - **BREAKING**: `/<job> fish` stops working. The `fish` option is removed from
   `utility.SetOptions`, from BRD's `UtilityCommands` help listing, and from its
   `ReservedCommands` guard. Typing it does nothing, the same as any other
   unrecognised word.
-- Add `/fish rod <name>` and `/fish bait <name>` to choose the rod and the bait
+- Add `/fsh rod <name>` and `/fsh bait <name>` to choose the rod and the bait
   from named lists held in `fishing.lua`. The choice takes effect immediately and
   survives the set being toggled off and on again.
 - Choosing a rod or bait enables fishing if it is off, so one command is enough
   to start: the gear goes on and the macro book switches, the same as the toggle.
-- Add listings: `/fish rod` and `/fish bait` with no argument name the choices
-  available, and `/fish help` shows every word `/fish` accepts and what is
+- Add listings: `/fsh rod` and `/fsh bait` with no argument name the choices
+  available, and `/fsh help` shows every word `/fsh` accepts and what is
   currently selected.
 - Give `utility.lua` an `OnLoad`/`OnUnload` pair for the shared alias, and have
   every job profile call it from its own `OnLoad`/`OnUnload`. The utility

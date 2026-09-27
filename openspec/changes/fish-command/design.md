@@ -48,23 +48,37 @@ See `proposal.md` — Why. The constraints that shape the approach:
 
 ## Decisions
 
-### The `/fish` alias forwards an internal word, not `fish`
+### The alias is `/fsh`, not `/fish`
 
-`utility.OnLoad` registers `/alias /fish /lac fwd _fish` and
+`/fish` is the game's own command for casting a line. An Ashita alias is a
+textual substitution over what the player types, so registering `/fish` shadows
+the game command for as long as any profile is loaded — fishing would become
+impossible from the job the alias was meant to serve. `/fsh` collides with
+nothing and is shorter to type, which matters for the command's primary verb.
+
+Alternative considered: `/fishset`, which is unambiguous and self-describing.
+Rejected — it reads oddly over the tackle subcommands (`/fishset rod lu`), and
+the toggle is typed often enough during a session that eight characters is a
+cost.
+
+### The alias forwards an internal word, not `fish`
+
+`utility.OnLoad` registers `/alias /fsh /lac fwd _fish` and
 `utility.OnUnload` deletes it. Every job profile calls the pair from its own
 `OnLoad`/`OnUnload`, next to its own alias line.
 
 The forwarded word has to differ from `fish`, and that is what retires the old
-form. `/alias /fish /lac fwd fish` would make `/fish` and `/<job> fish`
-textually the same command — keeping both is then unavoidable, and the proposal's
-choice is to retire the job-scoped form. Forwarding `_fish` instead means `/fish`
-is the only way to produce the word the handler looks for; `/bst fish` arrives as
-an unrecognised word and falls through, which is the behavior the spec asks for.
-The leading underscore marks it as a word the player is not meant to type.
+form. Forwarding `fish` would leave `/<job> fish` working exactly as it does
+today, since both words would reach the same branch — keeping both is then
+unavoidable, and the proposal's choice is to retire the job-scoped form.
+Forwarding `_fish` instead means `/fsh` is the only way to produce the word the
+handler looks for; `/bst fish` arrives as an unrecognised word and falls through,
+which is the behavior the spec asks for. The leading underscore marks it as a
+word the player is not meant to type.
 
 Alternative considered: registering the alias from `fishing.lua`'s module body,
 which runs at profile load anyway, avoiding an edit to ten job files. Rejected —
-there is no matching unload point, so `/fish` would outlive the profile that
+there is no matching unload point, so `/fsh` would outlive the profile that
 registered it and forward into whatever loaded next, and the project's
 convention is that aliases are `OnLoad`/`OnUnload` business.
 
@@ -126,7 +140,7 @@ verified against that index:
 | `lizard` | `Lizard Lure` |
 
 Defaults stay what `fishing.lua` hardcodes today: `halcyon` and `insect`, so
-`/fish` alone behaves exactly as `/<job> fish` did.
+`/fsh` alone behaves exactly as `/<job> fish` did.
 
 Alternative considered: keyed tables (`Rods['lu'] = "Lu Shang's F. Rod"`) for a
 direct lookup. Rejected — the listing order would be arbitrary. The arrays are a
@@ -162,16 +176,16 @@ alter it.
 nothing — notably it must not fall through to the toggle, or a typo would put the
 angler's gear on.
 
-Bare `/fish` toggles rather than printing help, unlike bare `/brd`. The toggle is
+Bare `/fsh` toggles rather than printing help, unlike bare `/brd`. The toggle is
 the command's primary verb and the word it replaces, so the common case stays one
-word; help is behind `/fish help`.
+word; help is behind `/fsh help`.
 
 ## Risks / Trade-offs
 
 - **Ashita might not preserve a fixed argument in the alias body**, i.e.
-  `/alias /fish /lac fwd _fish` may forward nothing or mangle the word → This is
+  `/alias /fsh /lac fwd _fish` may forward nothing or mangle the word → This is
   the one assumption the whole approach rests on, and it is cheap to check first:
-  register the alias and confirm `/fish` reaches the handler before any other
+  register the alias and confirm `/fsh` reaches the handler before any other
   work. If the alias body cannot carry an argument, the fallback is a distinct
   forwarding target rather than a distinct word, and `utility.OnLoad` is still
   where it is registered.
@@ -179,7 +193,7 @@ word; help is behind `/fish help`.
   memory → It is the choice the proposal records. `/brd help` stops advertising
   the word at the same time, which is the only place the project listed it.
 - **Ten job files change identically**, so one can be missed → A missed
-  `OnLoad` is visible immediately (`/fish` is not registered under that job); a
+  `OnLoad` is visible immediately (`/fsh` is not registered under that job); a
   missed `SetOptions` call site is a Lua error on the first utility command under
   that job, since `SetOptions` now indexes its first argument. Both surface on
   the first command typed under that job, so the verification step is to load

@@ -104,10 +104,10 @@ profile.SetOptions = function(args, book)
         gFunc.Message('use clamming set: ' .. tostring(Settings.UseClam));
     end
 
-    -- The word '/fish' forwards. It is deliberately not 'fish': the alias body
-    -- is what produces it, so '/<job> fish' cannot reach here and falls through
-    -- as an unrecognised word. The leading underscore marks it as a word the
-    -- player is not meant to type.
+    -- The word '/fsh' forwards. It is deliberately not 'fish': only the alias
+    -- body produces it, so '/<job> fish' cannot reach here and falls through as
+    -- an unrecognised word, which is what retires the old job-scoped form. The
+    -- leading underscore marks it as a word the player is not meant to type.
     if (option == '_fish') then
         fishing.HandleCommand(args, book);
     end
@@ -182,11 +182,11 @@ end
 -- way every other alias in this project is. Each job calls the pair from its
 -- own OnLoad/OnUnload.
 profile.OnLoad = function()
-    AshitaCore:GetChatManager():QueueCommand(-1, '/alias /fish /lac fwd _fish');
+    AshitaCore:GetChatManager():QueueCommand(-1, '/alias /fsh /lac fwd _fish');
 end
 
 profile.OnUnload = function()
-    AshitaCore:GetChatManager():QueueCommand(-1, '/alias delete /fish');
+    AshitaCore:GetChatManager():QueueCommand(-1, '/alias delete /fsh');
 end
 
 profile.CheckCast = function(name)

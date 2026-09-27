@@ -7,7 +7,7 @@ local profile = {};
 -- is linear over a dozen rows and only runs on a typed command, so it costs
 -- nothing.
 --
--- Cmd is the short word the player types after '/fish rod' or '/fish bait'.
+-- Cmd is the short word the player types after '/fsh rod' or '/fsh bait'.
 -- Item is the game's short item name -- what a bag scan matches -- taken from
 -- the item API index (tools/wikidata/api/item_index.json), not the wiki, the
 -- rule CLAUDE.md sets for every gear name in this project. A name the server
@@ -64,7 +64,7 @@ local function findTackle(registry, cmd)
     return nil;
 end
 
--- Defaults are what this file used to hardcode, so '/fish' alone behaves
+-- Defaults are what this file used to hardcode, so '/fsh' alone behaves
 -- exactly as '/<job> fish' did.
 local Settings = {
     UseFishing = false,
@@ -125,7 +125,7 @@ local function selectTackle(kind, cmd, book)
     local entry = findTackle(kind.Registry, cmd);
     if (entry == nil) then
         gFunc.Message('no ' .. kind.Label .. ' called "' .. tostring(cmd)
-            .. '": try /fish ' .. kind.Label);
+            .. '": try /fsh ' .. kind.Label);
         return;
     end
 
@@ -171,7 +171,7 @@ end
 -- What can be typed, plus what is currently selected, so one command answers
 -- both "what does this accept" and "what am I fishing with".
 local function showHelp()
-    gFunc.Message('/fish commands:');
+    gFunc.Message('/fsh commands:');
     helpRow('(no word)', 'toggle the fishing set and macro book');
     helpRow('rod <name>', 'choose a rod, or list the rods with no name');
     helpRow('bait <name>', 'choose a bait, or list the baits with no name');
@@ -212,8 +212,8 @@ profile.HandleCommand = function(args, book)
 
     -- Anything else is reported rather than falling through to the toggle: a
     -- typo must not put the angler's gear on.
-    gFunc.Message('/fish: no command "' .. tostring(args[2])
-        .. '": try /fish help');
+    gFunc.Message('/fsh: no command "' .. tostring(args[2])
+        .. '": try /fsh help');
 end
 
 profile.EquipSet = function()

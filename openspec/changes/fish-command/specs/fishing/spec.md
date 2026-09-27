@@ -9,16 +9,18 @@ book worn while fishing, and the rod and bait the character fishes with.
 
 ### Requirement: Fishing has its own command, available under every job
 
-The profile set SHALL register a `/fish` chat command while any job profile is
-loaded, and SHALL remove it when that profile is unloaded. `/fish` SHALL be
-available alongside the loaded job's own alias, not inside it: the word for
-fishing SHALL NOT change when the job changes. The job aliases SHALL NOT accept
+The profile set SHALL register a `/fsh` chat command while any job profile is
+loaded, and SHALL remove it when that profile is unloaded. The command word
+SHALL NOT be one the game itself provides — `/fish` casts a line, and an alias
+over it would shadow the game command for as long as a profile is loaded.
+`/fsh` SHALL be available alongside the loaded job's own alias, not inside it:
+the word for fishing SHALL NOT change when the job changes. The job aliases SHALL NOT accept
 a fishing option — `/<job> fish` does nothing, the same as any other word the
 job does not handle.
 
 #### Scenario: Fishing from one job
 
-- **WHEN** a job profile is loaded and the player types `/fish`
+- **WHEN** a job profile is loaded and the player types `/fsh`
 - **THEN** the command is handled, and the same word works after switching to
   any other job
 
@@ -31,24 +33,24 @@ job does not handle.
 #### Scenario: Unloading the profile
 
 - **WHEN** the loaded job profile is unloaded
-- **THEN** `/fish` is no longer registered
+- **THEN** `/fsh` is no longer registered
 
-### Requirement: `/fish` toggles the fishing set and macro book
+### Requirement: `/fsh` toggles the fishing set and macro book
 
-`/fish` with no argument SHALL toggle fishing. Enabling it SHALL switch the
+`/fsh` with no argument SHALL toggle fishing. Enabling it SHALL switch the
 macro book to the fishing book; disabling it SHALL restore the macro book the
 loaded job declares as its own, when that job declares one. The profile SHALL
 report the resulting state to the player either way.
 
 #### Scenario: Turning fishing on
 
-- **WHEN** fishing is off and the player types `/fish`
+- **WHEN** fishing is off and the player types `/fsh`
 - **THEN** fishing becomes enabled, the macro book switches to the fishing book,
   and the new state is reported
 
 #### Scenario: Turning fishing off
 
-- **WHEN** fishing is on and the player types `/fish`
+- **WHEN** fishing is on and the player types `/fsh`
 - **THEN** fishing becomes disabled, the macro book returns to the loaded job's
   own book if it declares one, and the new state is reported
 
@@ -75,23 +77,23 @@ the fishing set.
 
 ### Requirement: The rod and the bait are chosen by command
 
-The profile SHALL accept `/fish rod <name>` and `/fish bait <name>`, where
+The profile SHALL accept `/fsh rod <name>` and `/fsh bait <name>`, where
 `<name>` is one short word naming an entry in the profile's list of rods or
 baits. A recognised name SHALL become the selection, SHALL be reported to the
 player, and SHALL take effect on the next gear application without a reload. A
 name that is not in the list SHALL be reported as unrecognised and SHALL leave
 the current selection unchanged. The profile SHALL start with a default rod and
-a default bait selected, so `/fish` alone is usable without choosing either.
+a default bait selected, so `/fsh` alone is usable without choosing either.
 
 #### Scenario: Choosing a listed rod
 
-- **WHEN** the player types `/fish rod` with a name from the rod list
+- **WHEN** the player types `/fsh rod` with a name from the rod list
 - **THEN** that rod becomes the selection, it is reported, and it is the rod
   worn in the ranged slot from then on
 
 #### Scenario: Choosing a listed bait
 
-- **WHEN** the player types `/fish bait` with a name from the bait list
+- **WHEN** the player types `/fsh bait` with a name from the bait list
 - **THEN** that bait becomes the selection, it is reported, and it is the bait
   worn in the ammo slot from then on
 
@@ -133,26 +135,26 @@ SHALL leave it enabled and SHALL NOT switch the macro book again.
 
 ### Requirement: The command lists what it accepts
 
-`/fish rod` and `/fish bait` with no name SHALL list the names available for
-that kind of tackle and mark the current selection. `/fish help` SHALL list
-every word `/fish` accepts, along with the selected rod and bait and whether
+`/fsh rod` and `/fsh bait` with no name SHALL list the names available for
+that kind of tackle and mark the current selection. `/fsh help` SHALL list
+every word `/fsh` accepts, along with the selected rod and bait and whether
 fishing is currently enabled. Neither listing SHALL change the fishing state,
 the selections, or the macro book.
 
 #### Scenario: Listing the rods
 
-- **WHEN** the player types `/fish rod` with no name
+- **WHEN** the player types `/fsh rod` with no name
 - **THEN** the available rod names are listed with the current one marked, and
   nothing about the fishing state changes
 
 #### Scenario: Listing the baits
 
-- **WHEN** the player types `/fish bait` with no name
+- **WHEN** the player types `/fsh bait` with no name
 - **THEN** the available bait names are listed with the current one marked, and
   nothing about the fishing state changes
 
 #### Scenario: Asking for help
 
-- **WHEN** the player types `/fish help`
+- **WHEN** the player types `/fsh help`
 - **THEN** every accepted word is listed, together with the selected rod, the
   selected bait, and whether fishing is enabled
