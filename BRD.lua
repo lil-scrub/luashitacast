@@ -495,12 +495,9 @@ sets = {
              'Sha\'ir Gages', 'Sheikh Gages', 'Tarasque Mitts', 'Tarasque Mitts +1',
              'Marine F Gloves', 'Marine M Gloves', 'Choral Cuffs', 'Enlil\'s Kolluks',
              'Ea\'s Dastanas' },
-        Ring1 = { 'Epsilon Ring', 'Dark Ring', 'Light Ring', 'Angel\'s Ring', 'Heavens Ring',
-             'Heavens Ring +1', 'Shining Ring', 'Serene Ring', 'Allure Ring', 'Allure Ring +1',
-             'Moon Ring', 'Nereid Ring', 'Trumpet Ring', 'Balrahn\'s Ring', 'Kshama Ring No. 6',
-             'Vilma\'s Ring', 'Loyalty Ring', 'Loyalty Ring +1', 'Maldust Ring',
-             'Malflame Ring', 'Malflash Ring', 'Malflood Ring', 'Malfrost Ring', 'Malgust Ring',
-             'Hope Ring', 'Opal Ring' },
+        -- Ring1 is reserved for Minstrel's Ring (see RingProc); this set only
+        -- fills Ring2, or the Midcast swap would pull the ring back off before
+        -- the song finishes casting and cut its latent short mid-cast.
         Ring2 = { 'Epsilon Ring', 'Dark Ring', 'Light Ring', 'Angel\'s Ring', 'Heavens Ring',
              'Heavens Ring +1', 'Shining Ring', 'Serene Ring', 'Allure Ring', 'Allure Ring +1',
              'Moon Ring', 'Nereid Ring', 'Trumpet Ring', 'Balrahn\'s Ring', 'Kshama Ring No. 6',
@@ -556,12 +553,9 @@ sets = {
              'Pantin Dastanas +1', 'Chl. Cuffs +1', 'Sha\'ir Gages', 'Sheikh Gages',
              'Marine F Gloves', 'Marine M Gloves', 'Choral Cuffs', 'Sennight Bangles',
              'Enlil\'s Kolluks', 'Ea\'s Dastanas' },
-        Ring1 = { 'Epsilon Ring', 'Dark Ring', 'Light Ring', 'Angel\'s Ring', 'Heavens Ring',
-             'Heavens Ring +1', 'Shining Ring', 'Insect Ring', 'Serene Ring', 'Allure Ring',
-             'Allure Ring +1', 'Moon Ring', 'Balrahn\'s Ring', 'Kshama Ring No. 6',
-             'Vilma\'s Ring', 'Loyalty Ring', 'Loyalty Ring +1', 'Maldust Ring',
-             'Malflame Ring', 'Malflash Ring', 'Malflood Ring', 'Malfrost Ring', 'Tamas Ring',
-             'Hope Ring', 'Opal Ring' },
+        -- Ring1 is reserved for Minstrel's Ring (see RingProc); this set only
+        -- fills Ring2, or the Midcast swap would pull the ring back off before
+        -- the song finishes casting and cut its latent short mid-cast.
         Ring2 = { 'Epsilon Ring', 'Dark Ring', 'Light Ring', 'Angel\'s Ring', 'Heavens Ring',
              'Heavens Ring +1', 'Shining Ring', 'Insect Ring', 'Serene Ring', 'Allure Ring',
              'Allure Ring +1', 'Moon Ring', 'Balrahn\'s Ring', 'Kshama Ring No. 6',
